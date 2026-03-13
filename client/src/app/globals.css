@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --brand-primary: #254441;
+  --brand-secondary: #f37721;
+}
+
+@theme {
+  --color-primary: var(--brand-primary);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--brand-secondary);
+  --color-secondary-foreground: #ffffff;
+  
+  /* Mapping brand colors to commonly used indigo/violet for site-wide update */
+  --color-indigo-50: color-mix(in srgb, var(--brand-primary) 5%, white);
+  --color-indigo-100: color-mix(in srgb, var(--brand-primary) 10%, white);
+  --color-indigo-200: color-mix(in srgb, var(--brand-primary) 20%, white);
+  --color-indigo-500: color-mix(in srgb, var(--brand-primary) 80%, white);
+  --color-indigo-600: var(--brand-primary);
+  --color-indigo-700: color-mix(in srgb, var(--brand-primary) 90%, black);
+
+  --color-violet-50: color-mix(in srgb, var(--brand-secondary) 5%, white);
+  --color-violet-100: color-mix(in srgb, var(--brand-secondary) 10%, white);
+  --color-violet-200: color-mix(in srgb, var(--brand-secondary) 20%, white);
+  --color-violet-500: color-mix(in srgb, var(--brand-secondary) 80%, white);
+  --color-violet-600: var(--brand-secondary);
+  --color-violet-700: color-mix(in srgb, var(--brand-secondary) 90%, black);
+
+  --color-rose-500: #ef4444;
+  --color-rose-600: #dc2626;
+  
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-montserrat), var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-inter), sans-serif;
+  }
+
+  body {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    @apply bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-montserrat), sans-serif;
+    @apply text-primary dark:text-white;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border border-white/20 dark:border-slate-800/50;
+  }
+
+  .glass-premium {
+    @apply bg-white/40 dark:bg-slate-950/40 backdrop-blur-2xl border border-white/30 dark:border-slate-800/50 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)];
+  }
+  
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .mask-radial {
+    mask-image: radial-gradient(circle at center, black, transparent);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .shadow-premium {
+    @apply shadow-[0_20px_50px_rgba(0,0,0,0.03)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.1)];
+  }
+}
+
+/* Custom transitions */
+.page-transition {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom Scrollbar for modern look */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 dark:bg-slate-800 rounded-full transition-colors;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-300 dark:bg-slate-700;
+}
