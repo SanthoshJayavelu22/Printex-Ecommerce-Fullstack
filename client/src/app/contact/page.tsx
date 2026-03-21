@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Mail, Phone, MapPin, ArrowRight, Clock, Activity, Globe } from 'lucide-react';
+import { Mail, Phone, MapPin, ArrowRight, Activity, Globe, Send, MessageSquare } from 'lucide-react';
 import { useSettings } from '@/contexts/SettingsContext';
 import { fetchApi } from '@/lib/api';
 import Header from '@/components/Header';
@@ -37,11 +37,11 @@ export default function ContactPage() {
         body: JSON.stringify(formData)
       });
       if (res.success) {
-        alert("Message sent! We'll get back to you soon.");
+        alert("Transmission Received. Our team will contact you shortly.");
         setFormData({ name: '', email: '', phone: '', subject: 'General Inquiry', message: '' });
       }
     } catch (err: any) {
-      alert(err.message || "Failed to send message");
+      alert(err.message || "Uplink Failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -49,51 +49,29 @@ export default function ContactPage() {
 
   useGSAP(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out', duration: 1.5 } });
-    tl.fromTo('.reveal-text', { opacity: 0, y: 100 }, { opacity: 1, y: 0, stagger: 0.1 })
-      .fromTo('.reveal-side', { x: -100, opacity: 0 }, { x: 0, opacity: 1 }, '-=1')
-      .fromTo('.reveal-up', { y: 50, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.2 }, '-=0.5');
+    
+    tl.fromTo('.hero-title', { opacity: 0, y: 100 }, { opacity: 1, y: 0 })
+      .fromTo('.hero-subtitle', { opacity: 0, x: -30 }, { opacity: 1, x: 0 }, '-=1')
+      .fromTo('.info-card', { opacity: 0, scale: 0.9, y: 30 }, { opacity: 1, scale: 1, y: 0, stagger: 0.2 }, '-=1');
 
-    gsap.utils.toArray('.parallax-container').forEach((container: any) => {
-      const img = container.querySelector('img');
-      if (img) {
-        gsap.to(img, {
-          yPercent: 15,
-          scale: 1.05,
-          scrollTrigger: {
-            trigger: container,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true
-          }
-        });
+    gsap.fromTo('.form-container', 
+      { opacity: 0, y: 50 }, 
+      { 
+        opacity: 1, y: 0, 
+        scrollTrigger: {
+          trigger: '.form-container',
+          start: 'top 80%',
+        }
       }
-    });
-
-    gsap.to('.vertical-watermark', {
-      yPercent: -50,
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 1
-      }
-    });
-  }, { dependencies: [], scope: containerRef });
+    );
+  }, { scope: containerRef });
 
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
+      duration: 1.4,
       smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
-      infinite: false,
+      wheelMultiplier: 1.2,
     });
-
-    const onScroll = () => ScrollTrigger.update();
-    lenis.on('scroll', onScroll);
 
     function raf(time: number) {
       lenis.raf(time);
@@ -101,171 +79,181 @@ export default function ContactPage() {
     }
 
     requestAnimationFrame(raf);
-
-    return () => {
-      lenis.destroy();
-      lenis.off('scroll', onScroll);
-    };
+    return () => lenis.destroy();
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-32 pb-20 px-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
-          <div>
-            <h1 className="text-6xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic mb-8">Get In Touch</h1>
-            <p className="text-lg font-bold text-slate-500 max-w-sm mb-12">Whether you need custom design help or order status, our team is ready to assist you.</p>
-            
-            <div className="space-y-8">
-               <div className="flex gap-6 items-center">
-                  <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-600/30">
-                     <Phone size={24} />
-                  </div>
-                  <div>
-                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Phone Support</p>
-                     <p className="font-black text-slate-900 dark:text-white italic">{settings?.contactPhone || '+91 98765 43210'}</p>
-                  </div>
-               </div>
-               <div className="flex gap-6 items-center">
-                  <div className="w-14 h-14 bg-black text-white rounded-2xl flex items-center justify-center shadow-2xl shadow-black/30">
-                     <Mail size={24} />
-                  </div>
-                  <div>
-                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email Support</p>
-                     <p className="font-black text-slate-900 dark:text-white italic">{settings?.contactEmail || 'support@printixlabels.com'}</p>
-                  </div>
-               </div>
-               <div className="flex gap-6 items-center">
-                  <div className="w-14 h-14 bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl flex items-center justify-center">
-                     <MapPin size={24} />
-                  </div>
-                  <div className="text-4xl md:text-5xl font-black text-black mb-4 group-hover:text-orange-500 transition-colors uppercase tracking-tighter">{spec.val}</div>
-                  <p className="text-sm text-black/60 font-medium leading-relaxed">{spec.desc}</p>
-                  <div className="mt-10 h-[2px] w-full bg-black/5 relative overflow-hidden rounded-full">
-                    <div className="absolute inset-0 bg-orange-500 w-0 group-hover:w-full transition-all duration-700 ease-out" />
-                  </div>
+    <div ref={containerRef} className="bg-white dark:bg-[#050505] text-slate-900 dark:text-white transition-colors duration-500 overflow-x-hidden">
+      <Header />
+      
+      <main className="pt-32 md:pt-40 pb-16">
+        
+        {/* --- HERO SECTION --- */}
+        <section className="relative px-6 py-24 md:py-32 mb-20 overflow-hidden rounded-[2rem] max-w-7xl mx-auto mx-6">
+          {/* Background Image with Overlay */}
+          <div className="absolute inset-0 z-0">
+             <Image 
+                src="/hero_printing.png" 
+                alt="Production Facility" 
+                fill 
+                className="object-cover grayscale hover:grayscale-0 transition-all duration-[3s]"
+                priority
+             />
+             <div className="absolute inset-0 bg-slate-950/80 dark:bg-black/90 backdrop-blur-[2px]" />
+             <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-indigo-500/5" />
+          </div>
+
+          <div className="relative z-10">
+             <div className="absolute -top-10 -left-10 w-48 h-48 bg-orange-500/10 rounded-full blur-[80px] pointer-events-none" />
+             <div className="relative z-10">
+                <span className="hero-subtitle text-[10px] font-black uppercase tracking-[0.5em] text-orange-500 mb-4 block">Communication Hub</span>
+                <h1 className="hero-title text-5xl md:text-7xl font-black uppercase tracking-tighter leading-[0.9] italic mb-8 text-white">
+                   LET'S <br/>
+                   <span className="text-transparent" style={{ WebkitTextStroke: '1.5px white' }}>CHALLENGE</span> <br/>
+                   CONVENTIONS.
+                </h1>
+                <p className="max-w-lg text-base font-bold text-slate-400 mb-12 leading-relaxed">
+                   High-precision manufacturing meets avant-garde design. Our team is ready to scale your identity into the physical realm.
+                </p>
+             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+             {/* Phone Card */}
+             <div className="info-card group bg-slate-50 dark:bg-[#111] p-8 border border-slate-200 dark:border-white/5 rounded-3xl hover:bg-black dark:hover:bg-orange-500 hover:text-white transition-all duration-500">
+                <div className="w-12 h-12 bg-orange-500 group-hover:bg-white/20 rounded-xl flex items-center justify-center mb-6 transition-colors">
+                   <Phone size={24} className="text-white" />
                 </div>
-              ))}
-            </div>
+                <h3 className="text-[9px] font-black uppercase tracking-widest mb-1 opacity-60">Direct Line</h3>
+                <p className="text-xl font-black italic">{settings?.contactPhone || '+91 98765 43210'}</p>
+             </div>
+
+             {/* Email Card */}
+             <div className="info-card group bg-slate-50 dark:bg-[#111] p-8 border border-slate-200 dark:border-white/5 rounded-3xl hover:bg-black dark:hover:bg-orange-500 hover:text-white transition-all duration-500">
+                <div className="w-12 h-12 bg-indigo-600 group-hover:bg-white/20 rounded-xl flex items-center justify-center mb-6 transition-colors">
+                   <Mail size={24} className="text-white" />
+                </div>
+                <h3 className="text-[9px] font-black uppercase tracking-widest mb-1 opacity-60">Data Request</h3>
+                <p className="text-xl font-black italic truncate">{settings?.contactEmail || 'studio@printix.com'}</p>
+             </div>
+
+             {/* Location Card */}
+             <div className="info-card group bg-slate-50 dark:bg-[#111] p-8 border border-slate-200 dark:border-white/5 rounded-3xl hover:bg-black dark:hover:bg-orange-500 hover:text-white transition-all duration-500">
+                <div className="w-12 h-12 bg-black dark:bg-[#222] group-hover:bg-white/20 rounded-xl flex items-center justify-center mb-6 transition-colors">
+                   <MapPin size={24} className="text-white" />
+                </div>
+                <h3 className="text-[9px] font-black uppercase tracking-widest mb-1 opacity-60">Headquarters</h3>
+                <p className="text-lg font-black italic leading-tight">{settings?.address || '123 Printing Way, Tech City'}</p>
+             </div>
           </div>
         </section>
 
-        {/* --- THE FORM (Overlap Design) --- */}
-        <section className="py-16 md:py-32 px-6 bg-black relative overflow-hidden text-white">
-          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-500/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-
-          <div className="max-w-7xl mx-auto grid grid-cols-12 gap-8 items-center relative z-10">
-            
-            {/* Form Side */}
-            <div className="col-span-12 lg:col-span-6 relative z-20 order-2 lg:order-1">
-              <div className="bg-[#111111] p-12 lg:p-16 shadow-[60px_60px_0px_0px_#f97316] relative reveal-up border border-white/10 rounded-tr-[4rem] rounded-bl-[4rem]">
-                
-                <div className="flex items-center gap-4 mb-10">
-                  <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center text-white">
-                    <Activity size={20} />
-                  </div>
-                  <span className="text-xs font-black uppercase tracking-[0.4em] text-white">Submit Dossier</span>
-                </div>
-                
-                <h2 className="text-5xl font-black uppercase tracking-tighter leading-[0.85] mb-12 italic">
-                  PROJECT <br/> <span className="text-orange-500">SPECS.</span>
-                </h2>
-
-                <form onSubmit={handleSendMessage} className="space-y-10">
-                  <div className="space-y-4 group">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-white/40 group-focus-within:text-orange-500 transition-colors">Full Name</label>
-                    <input 
-                      required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      type="text" 
-                      className="w-full bg-transparent border-b-2 border-white/10 pb-3 text-xl font-medium text-white focus:outline-none focus:border-orange-500 transition-colors placeholder:text-white/20" 
-                      placeholder="John Doe" 
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <div className="space-y-4 group">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-white/40 group-focus-within:text-orange-500 transition-colors">Email Address</label>
-                      <input 
-                        required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})}
-                        type="email" 
-                        className="w-full bg-transparent border-b-2 border-white/10 pb-3 text-xl font-medium text-white focus:outline-none focus:border-orange-500 transition-colors placeholder:text-white/20" 
-                        placeholder="john@company.com" 
-                      />
+        {/* --- FORM SECTION --- */}
+        <section className="bg-black py-20 md:py-24 px-6 relative overflow-hidden">
+           <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay" />
+           <div className="absolute bottom-[-150px] right-[-150px] w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-[120px]" />
+           
+           <div className="max-w-6xl mx-auto grid grid-cols-12 relative z-10">
+              <div className="col-span-12 lg:col-span-10 lg:offset-1 form-container">
+                 <div className="bg-[#0c0c0c] border border-white/10 p-8 md:p-16 rounded-[3rem] relative shadow-2xl">
+                    <div className="flex items-center gap-4 mb-10">
+                       <span className="w-8 h-[1px] bg-orange-500" />
+                       <span className="text-[9px] font-black tracking-[0.5em] text-orange-500 uppercase">Initialize Mission</span>
                     </div>
-                    <div className="space-y-4 group">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-white/40 group-focus-within:text-orange-500 transition-colors">Direct Line</label>
-                      <input 
-                        required value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                        type="tel" 
-                        className="w-full bg-transparent border-b-2 border-white/10 pb-3 text-xl font-medium text-white focus:outline-none focus:border-orange-500 transition-colors placeholder:text-white/20" 
-                        placeholder="+1 (555) 000-0000" 
-                      />
-                    </div>
-                  </div>
 
-                  <div className="space-y-4 group">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-white/40 group-focus-within:text-orange-500 transition-colors">Message / Volume Details</label>
-                    <textarea 
-                      required value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})}
-                      rows={4} 
-                      className="w-full bg-transparent border-b-2 border-white/10 pb-3 text-xl font-medium text-white focus:outline-none focus:border-orange-500 transition-colors placeholder:text-white/20 resize-none leading-relaxed" 
-                      placeholder="Tell us about the volume, material, and timeframe..." 
-                    />
-                  </div>
+                    <h2 className="text-4xl md:text-6xl font-black text-white italic uppercase tracking-tighter mb-12 leading-none">
+                       START THE <br/> <span className="text-transparent" style={{ WebkitTextStroke: '1px #f97316' }}>PROCESS.</span>
+                    </h2>
 
-                  <button 
-                    disabled={loading} type="submit" 
-                    className="group mt-12 flex items-center justify-between w-full bg-white text-black hover:bg-orange-500 hover:text-white transition-colors px-10 py-6 font-black uppercase tracking-[0.3em] disabled:opacity-50"
-                  >
-                    <span>{loading ? 'Transmitting...' : 'Initialize Request'}</span>
-                    <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
-                  </button>
-                </form>
+                    <form onSubmit={handleSendMessage} className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                       <div className="space-y-3">
+                          <label className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Full Name</label>
+                          <input 
+                             required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})}
+                             className="w-full bg-transparent border-b border-white/10 py-3 text-lg font-bold text-white focus:outline-none focus:border-orange-500 transition-colors uppercase placeholder:text-white/5" 
+                             placeholder="IDENTIFY YOURSELF"
+                          />
+                       </div>
 
+                       <div className="space-y-3">
+                          <label className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Email Protocol</label>
+                          <input 
+                             required type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})}
+                             className="w-full bg-transparent border-b border-white/10 py-3 text-lg font-bold text-white focus:outline-none focus:border-orange-500 transition-colors uppercase placeholder:text-white/5" 
+                             placeholder="USER@DOMAIN.COM"
+                          />
+                       </div>
+
+                       <div className="space-y-3">
+                          <label className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Direct Line</label>
+                          <input 
+                             required value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                             className="w-full bg-transparent border-b border-white/10 py-3 text-lg font-bold text-white focus:outline-none focus:border-orange-500 transition-colors uppercase placeholder:text-white/5" 
+                             placeholder="+XX XXX XXX XXXX"
+                          />
+                       </div>
+
+                       <div className="space-y-3">
+                          <label className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Subject Matter</label>
+                          <input 
+                             value={formData.subject} onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                             className="w-full bg-transparent border-b border-white/10 py-3 text-lg font-bold text-white focus:outline-none focus:border-orange-500 transition-colors uppercase placeholder:text-white/5" 
+                             placeholder="GENERAL INQUIRY"
+                          />
+                       </div>
+
+                       <div className="col-span-full space-y-3 pt-4">
+                          <label className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">Briefing / Volume / Specs</label>
+                          <textarea 
+                             required rows={4} value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})}
+                             className="w-full bg-transparent border-b border-white/10 py-3 text-lg font-bold text-white focus:outline-none focus:border-orange-500 transition-colors uppercase resize-none placeholder:text-white/5" 
+                             placeholder="STATE YOUR PROJECT REQUIREMENTS..."
+                          />
+                       </div>
+
+                       <div className="col-span-full pt-10">
+                          <button 
+                             disabled={loading}
+                             type="submit"
+                             className="w-full bg-orange-500 text-white p-6 md:p-8 font-black text-xl uppercase italic flex items-center justify-between hover:bg-white hover:text-black transition-all duration-500 group"
+                          >
+                             <span>{loading ? 'TRANSMITTING...' : 'INTITIALIZE REQUEST'}</span>
+                             <Send size={24} className="group-hover:translate-x-3 transition-transform duration-500" />
+                          </button>
+                       </div>
+                    </form>
+                 </div>
               </div>
-            </div>
-
-            {/* Overlap Image Side */}
-            <div className="col-span-12 lg:col-span-6 lg:-ml-24 relative overflow-hidden h-[600px] lg:h-[900px] parallax-container order-1 lg:order-2">
-              <div className="absolute inset-0 border-[20px] border-black z-20 pointer-events-none rounded-[4rem]" />
-              <Image 
-                src="/images/craftsmanship.png" 
-                alt="Contact Process" 
-                fill 
-                className="object-cover grayscale hover:grayscale-0 transition-all duration-[2s]"
-              />
-              <div className="absolute inset-0 bg-black/40" />
-              <div className="absolute top-12 right-12 text-right z-30">
-                <div className="text-[10rem] font-black text-white/10 leading-none outline-text">401</div>
-              </div>
-            </div>
-
-          </div>
+           </div>
         </section>
 
         {/* --- MAP SECTION --- */}
-        <section className="py-24 max-w-7xl mx-auto px-6 lg:px-24 reveal-up">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-               <h3 className="text-5xl md:text-6xl font-black uppercase tracking-tighter italic leading-none">Facility <br/><span className="text-orange-500 text-transparent" style={{ WebkitTextStroke: '1px #f97316' }}>Map.</span></h3>
-               <div className="text-[10px] font-black uppercase tracking-[1em] text-black/40">COORD_41.8781_N_87.6298_W</div>
-            </div>
-            <div className="w-full h-[600px] overflow-hidden border border-black/5 shadow-[0_20px_50px_rgba(0,0,0,0.05)] relative group bg-[#111111] skew-y-[-2deg]">
-              <div className="absolute inset-0 bg-orange-500 mix-blend-color pointer-events-none z-10 opacity-0 group-hover:opacity-20 transition-opacity duration-1000" />
+        <section className="py-24 px-6 max-w-7xl mx-auto">
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-end mb-16">
+              <div>
+                 <span className="text-[9px] font-black text-orange-500 uppercase tracking-[0.8em] block mb-4">Strategic Location</span>
+                 <h2 className="text-5xl md:text-6xl font-black uppercase leading-none tracking-tighter italic">PHYSICAL <br/> FOOTPRINT.</h2>
+              </div>
+              <div className="text-[9px] font-mono text-slate-400 dark:text-slate-600 bg-slate-100 dark:bg-[#111] p-4 rounded-xl border border-slate-200 dark:border-white/5 shadow-inner w-fit">
+                 COORD_41.8781_N_87.6298_W_ACTIVE_FEED
+              </div>
+           </div>
+           
+           <div className="w-full h-[500px] overflow-hidden rounded-[3rem] border border-black/5 dark:border-white/10 relative group bg-[#0c0c0c] grayscale hover:grayscale-0 transition-all duration-1000">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1m3!1d190253.90566896263!2d-87.87223945828469!3d41.83390365731309!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880e2c3cd0f4cbed%3A0xafe0a6ad09c0c000!2sChicago%2C%20IL!5e0!3m2!1sen!2sus!4v1709149022646!5m2!1sen!2sus"
                 width="100%"
                 height="100%"
-                style={{ border: 0, filter: "grayscale(100%) contrast(1.1) opacity(0.8)" }}
+                style={{ border: 0 }}
                 allowFullScreen={false}
                 loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                className="group-hover:filter-none transition-all duration-[2s] ease-in-out scale-110"
-              ></iframe>
-              <div className="absolute top-12 left-12 bg-white/90 backdrop-blur-md px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-black shadow-2xl skew-y-[2deg] z-20">
+                className="opacity-60 group-hover:opacity-100 transition-opacity duration-1000"
+              />
+              <div className="absolute top-12 left-12 bg-white/95 dark:bg-black/95 backdrop-blur-xl px-10 py-6 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl z-20">
                 <span className="w-2 h-2 rounded-full bg-orange-500 inline-block mr-4 animate-pulse" />
-                Live Feed Active
+                Live Uplink Established
               </div>
-            </div>
+           </div>
         </section>
 
       </main>
