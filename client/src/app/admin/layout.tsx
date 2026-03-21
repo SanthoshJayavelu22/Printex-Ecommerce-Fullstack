@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, ShoppingBag, List, Users, LogOut, Package, Menu, X, ChevronRight, Bell, Moon, Sun, Tag, Star, Image as ImageIcon, Settings, Mail } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, List, Users, LogOut, Package, Menu, X, ChevronRight, Bell, Moon, Sun, Tag, Star, Image as ImageIcon, Settings, Mail, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAuthToken, removeAuthToken, fetchApi } from "@/lib/api";
 import { useTheme } from "next-themes";
@@ -120,7 +120,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold tracking-tight text-primary dark:text-white">
-                Printex Admin
+                Printix Admin
               </span>
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary">Admin Panel</span>
             </div>
@@ -209,7 +209,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="absolute top-[40%] -left-20 w-80 h-80 bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
 
         {/* Top Header */}
-        <header className={`sticky top-0 z-30 flex h-24 items-center justify-between px-8 transition-all duration-500 ${
+        <header className={`sticky top-0 z-40 flex h-24 items-center justify-between px-8 transition-all duration-500 ${
           scrolled 
             ? 'bg-white/70 dark:bg-[#020617]/70 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 py-4' 
             : 'bg-transparent py-6'
@@ -224,26 +224,40 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </button>
             
             <div className="hidden sm:flex flex-col">
-              <h1 className="text-xl font-black text-primary dark:text-white capitalize flex items-center gap-3">
+              <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">
+                <Link href="/admin" className="hover:text-primary transition-colors">Admin</Link>
+                <ChevronRight size={10} className="opacity-50" />
+                <span className="text-secondary">{pathname.split('/').pop() || 'Dashboard'}</span>
+              </div>
+              <h1 className="text-2xl font-black text-primary dark:text-white capitalize flex items-center gap-3 tracking-tight">
                 {pathname.split('/').pop() === 'admin' ? 'Dashboard Overview' : pathname.split('/').pop()}
                 <div className="h-1.5 w-1.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(243,119,33,0.6)]" />
               </h1>
-              <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-0.5">Logged in as Admin</p>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Search or Notifications could go here */}
-            <button className="p-3 text-slate-400 hover:text-secondary hover:bg-white dark:hover:bg-slate-800 rounded-2xl transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-700">
+            {/* Global Search Bar (Modern) */}
+            <div className="hidden md:flex relative group">
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" />
+              <input 
+                type="text" 
+                placeholder="Universal Search..." 
+                className="pl-12 pr-6 py-3 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-bold outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all w-64 focus:w-80 shadow-sm"
+              />
+            </div>
+
+            <button className="p-3 text-slate-400 hover:text-secondary hover:bg-white dark:hover:bg-slate-800 rounded-2xl transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-700 relative">
                <Bell size={20} />
+               <span className="absolute top-3 right-3 h-2 w-2 bg-rose-500 rounded-full border-2 border-white dark:border-slate-800 shadow-[0_0_8px_rgba(244,67,54,0.6)]" />
             </button>
 
             {mounted && (
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="group relative p-3 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-secondary dark:hover:text-secondary rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 transition-all duration-500 overflow-hidden"
+                className="group relative p-3 bg-primary/5 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary rounded-2xl shadow-sm border border-primary/20 dark:border-slate-700 transition-all duration-500 overflow-hidden"
               >
-                <div className="relative z-10">
+                <div className="relative z-10 flex items-center justify-center">
                   {theme === 'dark' ? <Sun size={20} className="animate-in spin-in-90 duration-500" /> : <Moon size={20} className="animate-in spin-in-90 duration-500" />}
                 </div>
                 <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />

@@ -65,9 +65,12 @@ export default function CartPage() {
                             <h3 className="text-lg font-bold text-slate-900 dark:text-white truncate">
                               {item.product?.name}
                             </h3>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-tight font-semibold">
-                              {item.selectedSize && `${item.selectedSize}`} 
-                              {item.selectedFinish && ` • ${item.selectedFinish}`}
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-tight font-semibold flex items-center gap-2 flex-wrap">
+                              {item.selectedShape && <span>{item.selectedShape}</span>}
+                              {item.selectedShape && <span>•</span>}
+                              {item.selectedSize && <span>{item.selectedSize}</span>} 
+                              {item.selectedMaterial || item.selectedFinish ? <span>•</span> : null}
+                              <span>{item.selectedMaterial || item.selectedFinish}</span>
                             </p>
                             {item.needsDesign && (
                               <div className="mt-2 text-[10px] font-black text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full w-fit uppercase tracking-widest">

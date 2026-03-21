@@ -79,7 +79,7 @@ export default function OrdersPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
               <div>
                 <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white">Order History</h1>
-                <p className="text-slate-500 dark:text-slate-400 mt-2">Manage and track your recent orders with Printex</p>
+                <p className="text-slate-500 dark:text-slate-400 mt-2">Manage and track your recent orders with Printix</p>
               </div>
               <Link 
                 href="/" 

@@ -20,7 +20,19 @@ export interface IProduct extends Document {
     defaultSize?: string;
     defaultQuantity?: number | null;
     defaultMaterial?: string;
+    availableShapes?: string[];
+    availableSizes?: string[];
+    availableMaterials?: string[];
+    availableQuantities?: number[];
+    fixedShape: boolean;
+    fixedSize: boolean;
+    fixedMaterial: boolean;
+    fixedQuantity: boolean;
     mainImage?: string;
+    quantityDiscounts?: {
+        minQuantity: number;
+        discountPercentage: number;
+    }[];
 }
 
 const productSchema: Schema<IProduct> = new Schema({
@@ -105,7 +117,49 @@ const productSchema: Schema<IProduct> = new Schema({
     defaultMaterial: {
         type: String,
         default: ''
-    }
+    },
+    availableShapes: {
+        type: [String],
+        default: []
+    },
+    availableSizes: {
+        type: [String],
+        default: []
+    },
+    availableMaterials: {
+        type: [String],
+        default: []
+    },
+    availableQuantities: {
+        type: [Number],
+        default: []
+    },
+    fixedShape: {
+        type: Boolean,
+        default: false
+    },
+    fixedSize: {
+        type: Boolean,
+        default: false
+    },
+    fixedMaterial: {
+        type: Boolean,
+        default: false
+    },
+    fixedQuantity: {
+        type: Boolean,
+        default: false
+    },
+    quantityDiscounts: [{
+        minQuantity: {
+            type: Number,
+            required: true
+        },
+        discountPercentage: {
+            type: Number,
+            required: true
+        }
+    }]
 }, {
     timestamps: true,
     toJSON: { virtuals: true },

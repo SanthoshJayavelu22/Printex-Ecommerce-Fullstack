@@ -22,7 +22,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     <div className="fixed inset-0 z-[100] bg-white overflow-y-auto page-transition">
       <div className="flex justify-between items-center p-8 border-b border-gray-50">
         <Link href="/" className="text-2xl font-black tracking-tighter text-primary uppercase" onClick={onClose}>
-          Printex Labels<span className="text-secondary">.</span>
+          Printix Labels<span className="text-secondary">.</span>
         </Link>
         <button onClick={onClose} className="w-12 h-12 rounded-full border border-black/5 flex items-center justify-center">
           <X size={24} />

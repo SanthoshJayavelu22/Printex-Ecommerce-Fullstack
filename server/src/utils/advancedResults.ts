@@ -27,7 +27,10 @@ const advancedResults = async <T = any>(
     let queryStr = JSON.stringify(reqQueryCopy);
 
     // Create operators ($gt, $gte, etc)
-    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
+    // Only prepend $ if it is not already there
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, (match, offset, fullStr) => {
+        return fullStr[offset - 1] === '$' ? match : `$${match}`;
+    });
 
     // Initial Query object
     let queryObj = JSON.parse(queryStr);

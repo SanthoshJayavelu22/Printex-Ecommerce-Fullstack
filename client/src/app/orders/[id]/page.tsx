@@ -170,10 +170,16 @@ export default function OrderDetailsPage() {
                               </div>
                               <div>
                                 <p className="font-bold text-slate-900 dark:text-white text-sm line-clamp-1 uppercase tracking-tight">{item.name || item.product?.name || 'Product'}</p>
-                                <div className="flex items-center gap-2 mt-0.5">
-                                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{item.selectedSize} • {item.selectedFinish}</p>
+                                <div className="flex flex-col mt-0.5">
+                                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-1.5 flex-wrap">
+                                    {item.selectedShape && <span>{item.selectedShape}</span>}
+                                    {item.selectedShape && <span>•</span>}
+                                    <span>{item.selectedSize}</span>
+                                    <span>•</span>
+                                    <span>{item.selectedMaterial || item.selectedFinish}</span>
+                                  </p>
                                   {item.needsDesign && (
-                                    <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full uppercase tracking-tighter">Pro Design</span>
+                                    <span className="text-[8px] font-black text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full uppercase tracking-tighter w-fit mt-1">Pro Design</span>
                                   )}
                                 </div>
                               </div>

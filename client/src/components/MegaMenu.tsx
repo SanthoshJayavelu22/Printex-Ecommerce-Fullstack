@@ -35,8 +35,8 @@ export default function MegaMenu() {
           </Link>
 
           {mainCat.children && mainCat.children.length > 0 && (
-            <div className="absolute left-0 right-0 top-full pointer-events-none opacity-0 translate-y-4 group-hover:translate-y-0 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 ease-out z-[100] px-4">
-              <div className="mt-2 bg-white rounded-[2.5rem] p-10 shadow-[0_30px_100px_rgba(0,0,0,0.15)] border border-slate-100 w-full max-w-7xl mx-auto overflow-hidden">
+            <div className="absolute left-0 right-0 top-full pointer-events-none opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 ease-out z-[100] px-4 pt-2">
+              <div className="bg-white rounded-[2.5rem] p-10 shadow-[0_30px_100px_rgba(0,0,0,0.15)] border border-slate-100 w-full max-w-7xl mx-auto overflow-hidden">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
                   <div className="lg:col-span-1.5 border-r border-slate-50 pr-8 hidden lg:block min-w-[180px]">
                      <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-tight mb-4 break-words">
@@ -94,7 +94,7 @@ export default function MegaMenu() {
           <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-300" />
         </button>
         
-        <div className="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-300 z-50">
+        <div className="absolute left-0 top-full pt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 z-50">
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 min-w-[160px]">
             <ul className="space-y-1">
               <li>

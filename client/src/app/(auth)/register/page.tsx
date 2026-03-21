@@ -63,7 +63,7 @@ export default function RegisterPage() {
           <div className="bg-white border border-slate-100 rounded-[2.5rem] p-10 shadow-[0_30px_100px_rgba(0,0,0,0.05)]">
             <div className="text-center mb-10">
               <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter mb-3">
-                Join Printex Labels
+                Join Printix Labels
               </h1>
               <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Join our community for premium solutions</p>
             </div>

@@ -16,6 +16,8 @@ interface CartItem {
   };
   quantity: number;
   selectedSize?: string;
+  selectedShape?: string;
+  selectedMaterial?: string;
   selectedFinish?: string;
   designUrl?: string;
   needsDesign?: boolean;

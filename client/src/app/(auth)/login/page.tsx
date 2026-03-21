@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
@@ -17,6 +17,8 @@ export default function LoginPage() {
   const { login } = useAuth();
   const { addToCart } = useCart();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +41,11 @@ export default function LoginPage() {
         }
       }
       
-      router.push('/');
+      if (redirect) {
+        router.push(redirect);
+      } else {
+        router.push('/');
+      }
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');
     } finally {

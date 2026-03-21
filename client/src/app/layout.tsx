@@ -20,15 +20,15 @@ const montserrat = Montserrat({
 })
 
 export const metadata: Metadata = {
-  title: 'Printex Labels | Premium Digital Printing & Label Solutions',
+  title: 'Printix Labels | Premium Digital Printing & Label Solutions',
   description: 'Elevate your brand with precision-engineered labels, custom stickers, and high-end digital printing. Industrial quality meets artistic micro-finishing.',
   keywords: 'custom stickers, barcode labels, premium printing, holographic labels, D2C packaging',
-  authors: [{ name: 'Printex Labels Studio' }],
+  authors: [{ name: 'Printix Labels Studio' }],
   openGraph: {
-    title: 'Printex Labels | Art of Precision',
+    title: 'Printix Labels | Art of Precision',
     description: 'Bespoke labeling solutions for modern brands.',
-    url: 'https://printexlabels.com',
-    siteName: 'Printex Labels',
+    url: 'https://printixlabels.com',
+    siteName: 'Printix Labels',
     images: [
       {
         url: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=1200&h=630&fit=crop',

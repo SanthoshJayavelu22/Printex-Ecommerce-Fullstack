@@ -44,7 +44,7 @@ export default function InstagramShowcase() {
             <h2 className="text-5xl md:text-[6rem] font-black text-black uppercase tracking-tighter mb-6 leading-[0.85] text-balance">
               The <br /> <span className="text-gray-200">Showcase.</span>
             </h2>
-            <p className="text-xl text-gray-400 font-medium">Join 10k+ brands sharing their identity. Tag #PrintexLabels</p>
+            <p className="text-xl text-gray-400 font-medium">Join 10k+ brands sharing their identity. Tag #PrintixLabels</p>
           </div>
           <button className="group flex items-center gap-4 px-10 py-5 rounded-full bg-black text-white font-black uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex-nowrap whitespace-nowrap">
             <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-colors duration-300">

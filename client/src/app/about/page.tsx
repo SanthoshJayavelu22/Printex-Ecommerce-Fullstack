@@ -122,15 +122,11 @@ export default function AboutPage() {
   }, []);
 
   return (
+
     <div ref={containerRef} className="bg-[#FAFAFA] overflow-x-hidden selection:bg-orange-500 selection:text-white">
       <Header />
       
-      {/* PERSISTENT ELEMENTS */}
-      <div className="fixed left-4 top-1/2 -translate-y-1/2 z-0 opacity-[0.03] select-none pointer-events-none hidden lg:block">
-        <h1 className="vertical-watermark text-[30rem] font-black leading-none uppercase tracking-tighter" style={{ writingMode: 'vertical-rl' }}>
-          PRINTEX
-        </h1>
-      </div>
+
 
       <main className="relative z-10">
         

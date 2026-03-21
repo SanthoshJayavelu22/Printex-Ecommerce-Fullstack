@@ -35,21 +35,21 @@ dotenv.config();
 // Connect to database
 connectDB().then(async () => {
     try {
-        let admin = await User.findOne({ email: 'admin@printexlabels.com' });
+        let admin = await User.findOne({ email: 'admin@printixlabels.com' });
         if (!admin) {
             admin = new User({
                 name: 'Super Admin',
-                email: 'admin@printexlabels.com',
+                email: 'admin@printixlabels.com',
                 password: 'password123',
                 role: 'super-admin'
             });
             await admin.save();
-            console.log("Super Admin seeded: admin@printexlabels.com | password123");
+            console.log("Super Admin seeded: admin@printixlabels.com | password123");
         } else if (admin.role !== 'super-admin') {
             admin.role = 'super-admin';
             admin.password = 'password123';
             await admin.save();
-            console.log("Super Admin updated: admin@printexlabels.com | password123");
+            console.log("Super Admin updated: admin@printixlabels.com | password123");
         }
     } catch (e) {
         console.error("Auto admin creation failed", e);
@@ -128,7 +128,7 @@ app.use('/api/newsletter', newsletterRoutes);
 app.use('/public', express.static('public'));
 
 app.get('/', (req: Request, res: Response) => {   
-    res.send('Printex Labels API is running...');
+    res.send('Printix Labels API is running...');
 });
 
 // Global Error Handler  

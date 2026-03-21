@@ -32,23 +32,23 @@ interface SettingsContextType {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 const defaultSettings: Settings = {
-  logo: "/images/printex-labels-logo.png",
-  storeName: "Printex Labels",
-  contactEmail: "info@printexlabels.com",
+  logo: "/images/printix-labels-logo.png",
+  storeName: "Printix Labels",
+  contactEmail: "info@printixlabels.com",
   contactPhone: "+91 98765 43210",
   address: "123, Printing Street, Industrial Area, Chennai, Tamil Nadu",
   socialLinks: {
-    facebook: "https://facebook.com/printex",
-    instagram: "https://instagram.com/printex",
-    twitter: "https://twitter.com/printex",
-    linkedin: "https://linkedin.com/company/printex"
+    facebook: "https://facebook.com/printix",
+    instagram: "https://instagram.com/printix",
+    twitter: "https://twitter.com/printix",
+    linkedin: "https://linkedin.com/company/printix"
   },
   seo: {
-    metaTitle: "Printex Labels | Premium Custom Sticker Printing",
+    metaTitle: "Printix Labels | Premium Custom Sticker Printing",
     metaDescription: "Crafting premium digital identities through precision label manufacturing and high-impact printing solutions.",
     metaKeywords: "stickers, labels, printing, custom labels, vinyl stickers"
   },
-  footerText: "© 2026 PRINTEX LABELS. ALL RIGHTS RESERVED."
+  footerText: "© 2026 PRINTIX LABELS. ALL RIGHTS RESERVED."
 };
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

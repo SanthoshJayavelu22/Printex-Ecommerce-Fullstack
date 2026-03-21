@@ -21,11 +21,19 @@ const cartSchema = new mongoose.Schema({
         },
         selectedSize: {
             type: String,
-            required: false // Optional depending on if the product needs it
+            required: false 
+        },
+        selectedShape: {
+            type: String,
+            required: false
+        },
+        selectedMaterial: {
+            type: String,
+            required: false
         },
         selectedFinish: {
             type: String,
-            required: false // Optional
+            required: false 
         },
         designUrl: {
             type: String,

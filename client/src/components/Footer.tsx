@@ -45,7 +45,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
           <div className="space-y-8">
             <Link href="/" className="text-3xl font-black tracking-tighter uppercase whitespace-nowrap">
-              {settings?.storeName || 'Printex'}<span className="text-white/50">.</span>
+              {settings?.storeName || 'Printix'}<span className="text-white/50">.</span>
             </Link>
             <p className="text-white/70 font-medium leading-relaxed max-w-xs">
               {settings?.seo?.metaDescription || 'Crafting premium digital identities through precision label manufacturing and high-impact printing solutions.'}
@@ -118,7 +118,7 @@ export default function Footer() {
 
         <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
           <p className="text-xs text-white/40 font-bold uppercase tracking-[0.3em]">
-            {settings?.footerText || `© ${new Date().getFullYear()} PRINTEX LABELS. ALL RIGHTS RESERVED.`}
+            {settings?.footerText || `© ${new Date().getFullYear()} PRINTIX LABELS. ALL RIGHTS RESERVED.`}
           </p>
           <button 
             onClick={scrollToTop}

@@ -109,81 +109,35 @@ export default function ContactPage() {
   }, []);
 
   return (
-    <div ref={containerRef} className="bg-[#FAFAFA] overflow-x-hidden selection:bg-orange-500 selection:text-white">
-      <Header />
-      
-      {/* PERSISTENT ELEMENTS */}
-      <div className="fixed left-4 top-1/2 -translate-y-1/2 z-0 opacity-[0.03] select-none pointer-events-none hidden lg:block">
-        <h1 className="vertical-watermark text-[30rem] font-black leading-none uppercase tracking-tighter" style={{ writingMode: 'vertical-rl' }}>
-          CONNECT
-        </h1>
-      </div>
-
-      <main className="relative z-10">
-        
-        {/* --- UNIQUE ASYMMETRIC HERO --- */}
-        <section className="min-h-screen flex flex-col lg:flex-row items-stretch pt-20 pb-16 md:pb-24">
-          <div className="lg:w-1/2 flex items-center px-6 lg:px-24 py-24 order-2 lg:order-1">
-            <div className="max-w-xl">
-              <div className="flex items-center gap-4 mb-8 reveal-side">
-                <div className="h-[2px] w-20 bg-orange-500" />
-                <span className="text-xs font-black uppercase tracking-[0.4em] text-orange-500">Secure Line Active</span>
-              </div>
-              <h1 className="text-7xl lg:text-[10rem] font-black leading-[0.8] tracking-tighter uppercase mb-12">
-                <span className="reveal-text block">INITIATE</span>
-                <span className="reveal-text block text-transparent" style={{ WebkitTextStroke: '2px black' }}>DIALOGUE.</span>
-              </h1>
-              <p className="text-2xl text-gray-400 font-medium leading-relaxed mb-16 reveal-up">
-                For precision print engineering and high-volume industrial labels. Connect with our logistics and technical team.
-              </p>
-              <div className="flex items-center gap-12 reveal-up">
-                <div className="group cursor-pointer">
-                  <div className="text-5xl font-black mb-1 group-hover:text-orange-500 transition-colors">24H</div>
-                  <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">Response SLA</div>
-                </div>
-                <div className="h-12 w-[1px] bg-black/10" />
-                <div className="group cursor-pointer">
-                  <div className="text-5xl font-black mb-1 group-hover:text-orange-500 transition-colors">100%</div>
-                  <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">Confidentiality</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="lg:w-1/2 relative min-h-[50vh] lg:min-h-screen order-1 lg:order-2">
-            <div className="absolute inset-0 skew-x-[-6deg] translate-x-12 lg:translate-x-24 overflow-hidden shadow-2xl">
-              <Image 
-                src="/images/innovation_lab.png" 
-                alt="Contact Hero" 
-                fill 
-                className="object-cover scale-110" 
-                priority
-              />
-              <div className="absolute inset-0 bg-black/40" />
-            </div>
-          </div>
-        </section>
-
-        {/* --- TECHNICAL CONTACT SPECS (Blueprints Style) --- */}
-        <section className="py-16 md:py-24 relative overflow-hidden bg-[#FAFAFA]">
-          <div className="absolute inset-0 opacity-[0.05] pointer-events-none" 
-               style={{ backgroundImage: 'radial-gradient(#000000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-          
-          <div className="max-w-7xl mx-auto px-6 lg:px-24 relative z-10">
-            <div className="text-center mb-24 reveal-up">
-              <h2 className="text-6xl md:text-9xl font-black text-black uppercase tracking-tighter mb-8 leading-none">SYS_ <span className="text-transparent" style={{ WebkitTextStroke: '2px #f97316' }}>NODES</span></h2>
-              <p className="text-black/60 font-black tracking-[0.5em] uppercase text-xs">Direct Communication Channels</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { label: "PHONE SUPPORT", val: settings?.contactPhone || '+1 800-PRINT', desc: "Direct line to our technical advising team.", icon: <Phone size={32} /> },
-                { label: "EMAIL SUPPORT", val: "HELLO@", desc: "Logistics, sales, and general inquiries.", icon: <Mail size={32} /> },
-                { label: "HEADQUARTERS", val: "HUB-401", desc: settings?.address || "124 Precision Dr, Industrial Park.", icon: <MapPin size={32} /> }
-              ].map((spec, i) => (
-                <div key={i} className="group p-10 bg-white border border-black/5 rounded-[2rem] shadow-sm hover:shadow-2xl hover:border-orange-500/20 transition-all duration-500 cursor-crosshair">
-                  <div className="flex justify-between items-start mb-12">
-                    <div className="text-[10px] font-black text-black/60 tracking-widest">{spec.label}</div>
-                    <div className="text-black/20 group-hover:text-orange-500 transition-colors">{spec.icon}</div>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-32 pb-20 px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-20">
+          <div>
+            <h1 className="text-6xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic mb-8">Get In Touch</h1>
+            <p className="text-lg font-bold text-slate-500 max-w-sm mb-12">Whether you need custom design help or order status, our team is ready to assist you.</p>
+            
+            <div className="space-y-8">
+               <div className="flex gap-6 items-center">
+                  <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-600/30">
+                     <Phone size={24} />
+                  </div>
+                  <div>
+                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Phone Support</p>
+                     <p className="font-black text-slate-900 dark:text-white italic">{settings?.contactPhone || '+91 98765 43210'}</p>
+                  </div>
+               </div>
+               <div className="flex gap-6 items-center">
+                  <div className="w-14 h-14 bg-black text-white rounded-2xl flex items-center justify-center shadow-2xl shadow-black/30">
+                     <Mail size={24} />
+                  </div>
+                  <div>
+                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email Support</p>
+                     <p className="font-black text-slate-900 dark:text-white italic">{settings?.contactEmail || 'support@printixlabels.com'}</p>
+                  </div>
+               </div>
+               <div className="flex gap-6 items-center">
+                  <div className="w-14 h-14 bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl flex items-center justify-center">
+                     <MapPin size={24} />
                   </div>
                   <div className="text-4xl md:text-5xl font-black text-black mb-4 group-hover:text-orange-500 transition-colors uppercase tracking-tighter">{spec.val}</div>
                   <p className="text-sm text-black/60 font-medium leading-relaxed">{spec.desc}</p>

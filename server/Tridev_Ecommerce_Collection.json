@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "printex-labels-api-v1",
-		"name": "Printex Labels API",
-		"description": "API collection for Printex Labels backend testing.",
+		"_postman_id": "printix-labels-api-v1",
+		"name": "Printix Labels API",
+		"description": "API collection for Printix Labels backend testing.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
