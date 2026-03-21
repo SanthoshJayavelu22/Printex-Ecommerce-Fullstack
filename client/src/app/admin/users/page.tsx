@@ -64,8 +64,8 @@ export default function AdminUsers() {
 
   const getRoleIcon = (role: string) => {
     switch(role) {
-      case 'super-admin': return <ShieldAlert size={16} className="text-purple-600" />;
-      case 'admin': return <BadgeCheck size={16} className="text-indigo-600" />;
+      case 'super-admin': return <ShieldAlert size={16} className="text-rose-600" />;
+      case 'admin': return <BadgeCheck size={16} className="text-primary" />;
       default: return <Users size={16} className="text-slate-500" />;
     }
   };
@@ -75,10 +75,10 @@ export default function AdminUsers() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-2">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="h-8 w-1.5 bg-indigo-600 rounded-full" />
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">User Management</h1>
+            <span className="h-8 w-1.5 bg-primary rounded-full shadow-[0_0_10px_rgba(37,68,65,0.3)]" />
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">User Registry</h1>
           </div>
-          <p className="text-slate-500 dark:text-slate-400 font-medium text-sm ml-3.5">Manage user roles and account details.</p>
+          <p className="text-slate-500 dark:text-slate-400 font-medium text-sm ml-3.5">Audit and manage the platform's core user ecosystem.</p>
         </div>
         
         <div className="flex items-center gap-3">
@@ -142,8 +142,8 @@ export default function AdminUsers() {
                   <div className="flex flex-col items-center text-center mt-2 flex-grow">
                     <div className="relative mb-6">
                       <div className={`h-24 w-24 rounded-[2rem] flex items-center justify-center text-2xl font-black shadow-xl transition-all duration-500 group-hover:rotate-6 ${
-                        user.role === 'super-admin' ? 'bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-purple-500/20' : 
-                        user.role === 'admin' ? 'bg-gradient-to-br from-indigo-500 to-blue-600 text-white shadow-indigo-500/20' : 
+                        user.role === 'super-admin' ? 'bg-gradient-to-br from-rose-500 to-rose-700 text-white shadow-rose-500/20' : 
+                        user.role === 'admin' ? 'bg-gradient-to-br from-primary to-[#3a635f] text-white shadow-primary/20' : 
                         'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 shadow-slate-200/50'
                       }`}>
                         {(user.name || "U")[0].toUpperCase()}
@@ -228,7 +228,7 @@ export default function AdminUsers() {
                   <button
                     key={i + 1}
                     onClick={() => setCurrentPage(i + 1)}
-                    className={`h-10 w-10 rounded-xl text-xs font-black transition-all duration-300 ${currentPage === i + 1 ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:bg-white dark:hover:bg-slate-800'}`}
+                    className={`h-10 w-10 rounded-xl text-xs font-black transition-all duration-300 ${currentPage === i + 1 ? 'bg-primary text-white shadow-lg' : 'text-slate-400 hover:bg-white dark:hover:bg-slate-800'}`}
                   >
                     {i + 1}
                   </button>

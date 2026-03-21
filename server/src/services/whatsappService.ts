@@ -90,7 +90,7 @@ class WhatsappService {
             return;
         }
 
-        const message = `Hello ${user.name}! 🛍️\n\nYour order #${order._id.toString().slice(-8).toUpperCase()} has been placed successfully at Printex Labels.\n\nTotal Amount: ₹${order.totalAmount.toLocaleString()}\nStatus: ${order.paymentInfo.status}\n\nThank you for shopping with us! ✨`;
+        const message = `Hello ${user.name}! 🛍️\n\nYour order #${order._id.toString().slice(-8).toUpperCase()} has been placed successfully at Printix Labels.\n\nTotal Amount: ₹${order.totalAmount.toLocaleString()}\nStatus: ${order.paymentInfo.status}\n\nThank you for shopping with us! ✨`;
 
         return this.sendMessage(phone, message).catch(err => {
             console.error('Failed to send WhatsApp confirmation:', err.message);

@@ -19,8 +19,46 @@ export const createProduct = async (productData: any, files: any, adminId: any) 
     // Convert relatedProducts to array if it is a string
     if (productData.relatedProducts && typeof productData.relatedProducts === 'string') {
         productData.relatedProducts = [productData.relatedProducts];
-    } else if (!productData.relatedProducts) {
+    } else {
         productData.relatedProducts = [];
+    }
+
+    // Helper to ensure field is a clean array
+    const ensureArray = (field: string, data: any) => {
+        let val = data[field];
+        if (!val) return [];
+        
+        // If it's a string, try JSON parse (for FormData strings like "[]")
+        if (typeof val === 'string') {
+            try {
+                const parsed = JSON.parse(val);
+                return Array.isArray(parsed) ? parsed : [parsed];
+            } catch (e) {
+                return [val];
+            }
+        }
+        
+        // If it's an array, handle cases like ["[]"] (sometimes happens with multipart parser)
+        if (Array.isArray(val)) {
+            if (val.length === 1 && typeof val[0] === 'string' && val[0].trim().startsWith('[')) {
+                try {
+                    const parsed = JSON.parse(val[0]);
+                    return Array.isArray(parsed) ? parsed : [parsed];
+                } catch (e) {}
+            }
+            return val;
+        }
+        
+        return [val];
+    };
+
+    ['quantityDiscounts', 'availableShapes', 'availableSizes', 'availableMaterials', 'availableQuantities'].forEach(field => {
+        productData[field] = ensureArray(field, productData);
+    });
+
+    // Ensure availableQuantities is array of numbers
+    if (Array.isArray(productData.availableQuantities)) {
+        productData.availableQuantities = productData.availableQuantities.map(n => Number(n)).filter(n => !isNaN(n));
     }
 
     // Clean up technical defaults (convert empty strings to null/proper types)
@@ -66,6 +104,42 @@ export const updateProduct = async (productId: string, updateData: any, files: a
     }
     if (updateData.relatedProducts && typeof updateData.relatedProducts === 'string') {
         updateData.relatedProducts = [updateData.relatedProducts];
+    }
+    
+    // Helper to ensure field is a clean array
+    const ensureArray = (field: string, data: any) => {
+        let val = data[field];
+        if (!val) return [];
+        
+        if (typeof val === 'string') {
+            try {
+                const parsed = JSON.parse(val);
+                return Array.isArray(parsed) ? parsed : [parsed];
+            } catch (e) {
+                return [val];
+            }
+        }
+        
+        if (Array.isArray(val)) {
+            if (val.length === 1 && typeof val[0] === 'string' && val[0].trim().startsWith('[')) {
+                try {
+                    const parsed = JSON.parse(val[0]);
+                    return Array.isArray(parsed) ? parsed : [parsed];
+                } catch (e) {}
+            }
+            return val;
+        }
+        
+        return [val];
+    };
+
+    ['quantityDiscounts', 'availableShapes', 'availableSizes', 'availableMaterials', 'availableQuantities'].forEach(field => {
+        updateData[field] = ensureArray(field, updateData);
+    });
+
+    // Ensure availableQuantities is array of numbers
+    if (Array.isArray(updateData.availableQuantities)) {
+        updateData.availableQuantities = updateData.availableQuantities.map(n => Number(n)).filter(n => !isNaN(n));
     }
 
     // Clean up technical defaults (convert empty strings to null/proper types)

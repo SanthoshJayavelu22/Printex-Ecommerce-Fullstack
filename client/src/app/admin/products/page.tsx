@@ -27,11 +27,26 @@ export default function AdminProducts() {
     defaultQuantity: "",
     defaultMaterial: "",
     isActive: true,
+    fixedShape: false,
+    fixedSize: false,
+    fixedMaterial: false,
+    fixedQuantity: false,
   });
+  const [availableShapes, setAvailableShapes] = useState<string[]>([]);
+  const [availableSizes, setAvailableSizes] = useState<string[]>([]);
+  const [availableMaterials, setAvailableMaterials] = useState<string[]>([]);
+  const [availableQuantities, setAvailableQuantities] = useState<number[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedRelated, setSelectedRelated] = useState<string[]>([]);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [quantityDiscounts, setQuantityDiscounts] = useState<{minQuantity: number, discountPercentage: number}[]>([]);
+  
+  // Raw input states for comma separation to avoid cursor jumping
+  const [shapesInput, setShapesInput] = useState("");
+  const [sizesInput, setSizesInput] = useState("");
+  const [materialsInput, setMaterialsInput] = useState("");
+  const [quantitiesInput, setQuantitiesInput] = useState("");
 
 
   useEffect(() => {
@@ -90,6 +105,20 @@ export default function AdminProducts() {
     setImagePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
+  const addDiscountTier = () => {
+    setQuantityDiscounts([...quantityDiscounts, { minQuantity: 0, discountPercentage: 0 }]);
+  };
+
+  const removeDiscountTier = (index: number) => {
+    setQuantityDiscounts(quantityDiscounts.filter((_, i) => i !== index));
+  };
+
+  const handleDiscountChange = (index: number, field: string, value: string) => {
+    const updated = [...quantityDiscounts];
+    updated[index] = { ...updated[index], [field]: Number(value) };
+    setQuantityDiscounts(updated);
+  };
+
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (imagePreviews.length === 0 && selectedCategories.length === 0) {
@@ -109,6 +138,15 @@ export default function AdminProducts() {
     payload.append("defaultQuantity", formData.defaultQuantity);
     payload.append("defaultMaterial", formData.defaultMaterial);
     payload.append("isActive", formData.isActive.toString());
+    payload.append("fixedShape", formData.fixedShape.toString());
+    payload.append("fixedSize", formData.fixedSize.toString());
+    payload.append("fixedMaterial", formData.fixedMaterial.toString());
+    payload.append("fixedQuantity", formData.fixedQuantity.toString());
+    payload.append("availableShapes", JSON.stringify(availableShapes));
+    payload.append("availableSizes", JSON.stringify(availableSizes));
+    payload.append("availableMaterials", JSON.stringify(availableMaterials));
+    payload.append("availableQuantities", JSON.stringify(availableQuantities));
+    payload.append("quantityDiscounts", JSON.stringify(quantityDiscounts));
     selectedCategories.forEach(c => payload.append("categories", c));
     selectedRelated.forEach(p => payload.append("relatedProducts", p));
     
@@ -163,12 +201,25 @@ export default function AdminProducts() {
       defaultSize: "", 
       defaultQuantity: "", 
       defaultMaterial: "",
-      isActive: true 
+      isActive: true,
+      fixedShape: false,
+      fixedSize: false,
+      fixedMaterial: false,
+      fixedQuantity: false,
     });
+    setAvailableShapes([]);
+    setAvailableSizes([]);
+    setAvailableMaterials([]);
+    setAvailableQuantities([]);
     setSelectedCategories([]);
     setSelectedRelated([]);
     setImages([]);
     setImagePreviews([]);
+    setQuantityDiscounts([]);
+    setShapesInput("");
+    setSizesInput("");
+    setMaterialsInput("");
+    setQuantitiesInput("");
   };
 
   const handleEditClick = async (prod: any) => {
@@ -189,7 +240,20 @@ export default function AdminProducts() {
           defaultQuantity: fullProd.defaultQuantity?.toString() || "",
           defaultMaterial: fullProd.defaultMaterial || "",
           isActive: fullProd.isActive !== undefined ? fullProd.isActive : true,
+          fixedShape: !!fullProd.fixedShape,
+          fixedSize: !!fullProd.fixedSize,
+          fixedMaterial: !!fullProd.fixedMaterial,
+          fixedQuantity: !!fullProd.fixedQuantity,
         });
+        setAvailableShapes(fullProd.availableShapes || []);
+        setAvailableSizes(fullProd.availableSizes || []);
+        setAvailableMaterials(fullProd.availableMaterials || []);
+        setAvailableQuantities(fullProd.availableQuantities || []);
+        
+        setShapesInput((fullProd.availableShapes || []).join(", "));
+        setSizesInput((fullProd.availableSizes || []).join(", "));
+        setMaterialsInput((fullProd.availableMaterials || []).join(", "));
+        setQuantitiesInput((fullProd.availableQuantities || []).join(", "));
        if (fullProd.categories && fullProd.categories.length) {
          setSelectedCategories(fullProd.categories.map((c: any) => c._id ? c._id : c));
        } else {
@@ -201,6 +265,8 @@ export default function AdminProducts() {
        } else {
          setSelectedRelated([]);
        }
+
+       setQuantityDiscounts(fullProd.quantityDiscounts || []);
 
        if (fullProd.images && fullProd.images.length > 0) {
          setImagePreviews(fullProd.images.map((img: string) => getImageUrl(img)));
@@ -274,10 +340,10 @@ export default function AdminProducts() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-2">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="h-8 w-1.5 bg-secondary rounded-full" />
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Products</h1>
+            <span className="h-8 w-1.5 bg-primary rounded-full shadow-[0_0_10px_rgba(37,68,65,0.3)]" />
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Product Catalog</h1>
           </div>
-          <p className="text-slate-500 dark:text-slate-400 font-medium text-sm ml-3.5">Manage your product catalog and listings.</p>
+          <p className="text-slate-500 dark:text-slate-400 font-medium text-sm ml-3.5">Inventory management and digital storefront control.</p>
         </div>
         <button
           onClick={() => {
@@ -350,50 +416,238 @@ export default function AdminProducts() {
               {/* Technical Defaults */}
               <div className="space-y-6 pt-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="h-1 w-4 bg-violet-500 rounded-full" />
-                  <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Default Selections</h3>
+                  <div className="h-1 w-4 bg-primary rounded-full" />
+                  <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Product Customization & Defaults</h3>
                 </div>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest ml-1">Shape</label>
-                    <select name="defaultShape" value={formData.defaultShape} onChange={(e: any) => setFormData({...formData, defaultShape: e.target.value})} className="block w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 py-3 px-4 text-xs font-bold text-slate-900 dark:text-white">
-                        <option value="">Not Set</option>
-                        <option value="Round">Round</option>
-                        <option value="Square / Rectangle">Square / Rectangle</option>
-                        <option value="Oval">Oval</option>
-                        <option value="Custom/Any Shape">Custom/Any Shape</option>
+                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-relaxed">
+                  Define the available options for this product. You can "Lock" a selection to force a specific value for the user.
+                  <br />
+                  <span className="text-secondary italic">Note: Type available options in the text box first, then select the default from the dropdown.</span>
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Shape Configuration */}
+                  <div className="bg-slate-50/50 dark:bg-slate-950/50 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest ml-1">Shape Options</label>
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="checkbox" 
+                          checked={formData.fixedShape} 
+                          onChange={(e) => setFormData({...formData, fixedShape: e.target.checked})} 
+                          className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" 
+                        />
+                        <span className="text-[9px] font-black uppercase text-slate-500">Lock Selection</span>
+                      </div>
+                    </div>
+                    <select name="defaultShape" value={formData.defaultShape} onChange={(e: any) => setFormData({...formData, defaultShape: e.target.value})} className="block w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 py-3 px-4 text-xs font-bold text-slate-900 dark:text-white">
+                        <option value="">Choose Default</option>
+                        {availableShapes.length > 0 ? (
+                          availableShapes.map(s => <option key={s} value={s}>{s}</option>)
+                        ) : (
+                          <>
+                            <option value="Round">Round</option>
+                            <option value="Square / Rectangle">Square / Rectangle</option>
+                            <option value="Oval">Oval</option>
+                            <option value="Custom/Any Shape">Custom/Any Shape</option>
+                          </>
+                        )}
                     </select>
+                    <input 
+                      type="text" 
+                      placeholder="Available Shapes (comma separated)" 
+                      value={shapesInput} 
+                      onChange={(e) => {
+                        setShapesInput(e.target.value);
+                        setAvailableShapes(e.target.value.split(",").map(v => v.trim()).filter(v => v));
+                      }}
+                      className="block w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 py-3 px-4 text-xs font-bold text-slate-900 dark:text-white" 
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest ml-1">Default Scale/Size</label>
-                    <select name="defaultSize" value={formData.defaultSize} onChange={(e: any) => setFormData({...formData, defaultSize: e.target.value})} className="block w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 py-3 px-4 text-xs font-bold text-slate-900 dark:text-white">
-                        <option value="">Not Set</option>
-                        <option value="2in x 2in">2in x 2in</option>
-                        <option value="3in x 3in">3in x 3in</option>
-                        <option value="4in x 4in">4in x 4in</option>
-                        <option value="Custom Size">Custom Size</option>
+
+                  {/* Size Configuration */}
+                  <div className="bg-slate-50/50 dark:bg-slate-950/50 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest ml-1">Size Options</label>
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="checkbox" 
+                          checked={formData.fixedSize} 
+                          onChange={(e) => setFormData({...formData, fixedSize: e.target.checked})} 
+                          className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" 
+                        />
+                        <span className="text-[9px] font-black uppercase text-slate-500">Lock Selection</span>
+                      </div>
+                    </div>
+                    <select name="defaultSize" value={formData.defaultSize} onChange={(e: any) => setFormData({...formData, defaultSize: e.target.value})} className="block w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 py-3 px-4 text-xs font-bold text-slate-900 dark:text-white">
+                        <option value="">Choose Default</option>
+                        {availableSizes.length > 0 ? (
+                          availableSizes.map(s => <option key={s} value={s}>{s}</option>)
+                        ) : (
+                          <>
+                            <option value="2in x 2in">2in x 2in</option>
+                            <option value="3in x 3in">3in x 3in</option>
+                            <option value="4in x 4in">4in x 4in</option>
+                            <option value="Custom Size">Custom Size</option>
+                          </>
+                        )}
                     </select>
+                    <input 
+                      type="text" 
+                      placeholder="Available Sizes (comma separated)" 
+                      value={sizesInput} 
+                      onChange={(e) => {
+                        setSizesInput(e.target.value);
+                        setAvailableSizes(e.target.value.split(",").map(v => v.trim()).filter(v => v));
+                      }}
+                      className="block w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 py-3 px-4 text-xs font-bold text-slate-900 dark:text-white" 
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest ml-1">Units (Default)</label>
-                    <select name="defaultQuantity" value={formData.defaultQuantity} onChange={(e: any) => setFormData({...formData, defaultQuantity: e.target.value})} className="block w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 py-3 px-4 text-xs font-bold text-slate-900 dark:text-white">
-                        <option value="">Not Set</option>
-                        <option value="100">100</option>
-                        <option value="250">250</option>
-                        <option value="500">500</option>
-                        <option value="1000">1000</option>
+
+                  {/* Material Configuration */}
+                  <div className="bg-slate-50/50 dark:bg-slate-950/50 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest ml-1">Material Options</label>
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="checkbox" 
+                          checked={formData.fixedMaterial} 
+                          onChange={(e) => setFormData({...formData, fixedMaterial: e.target.checked})} 
+                          className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" 
+                        />
+                        <span className="text-[9px] font-black uppercase text-slate-500">Lock Selection</span>
+                      </div>
+                    </div>
+                    <select name="defaultMaterial" value={formData.defaultMaterial} onChange={(e: any) => setFormData({...formData, defaultMaterial: e.target.value})} className="block w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 py-3 px-4 text-xs font-bold text-slate-900 dark:text-white">
+                        <option value="">Choose Default</option>
+                        {availableMaterials.length > 0 ? (
+                          availableMaterials.map(s => <option key={s} value={s}>{s}</option>)
+                        ) : (
+                          <>
+                            <option value="Standard">Standard</option>
+                            <option value="Water-Resist">Water-Resist</option>
+                            <option value="Transparent">Transparent</option>
+                            <option value="Brown Kraft">Brown Kraft</option>
+                          </>
+                        )}
                     </select>
+                    <input 
+                      type="text" 
+                      placeholder="Available Materials (comma separated)" 
+                      value={materialsInput} 
+                      onChange={(e) => {
+                        setMaterialsInput(e.target.value);
+                        setAvailableMaterials(e.target.value.split(",").map(v => v.trim()).filter(v => v));
+                      }}
+                      className="block w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 py-3 px-4 text-xs font-bold text-slate-900 dark:text-white" 
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest ml-1">Matter</label>
-                    <select name="defaultMaterial" value={formData.defaultMaterial} onChange={(e: any) => setFormData({...formData, defaultMaterial: e.target.value})} className="block w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 py-3 px-4 text-xs font-bold text-slate-900 dark:text-white">
-                        <option value="">Not Set</option>
-                        <option value="Standard">Standard</option>
-                        <option value="Water-Resist">Water-Resist</option>
-                        <option value="Transparent">Transparent</option>
-                        <option value="Brown Kraft">Brown Kraft</option>
+
+                  {/* Quantity Configuration */}
+                  <div className="bg-slate-50/50 dark:bg-slate-950/50 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest ml-1">Quantity Options</label>
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="checkbox" 
+                          checked={formData.fixedQuantity} 
+                          onChange={(e) => setFormData({...formData, fixedQuantity: e.target.checked})} 
+                          className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" 
+                        />
+                        <span className="text-[9px] font-black uppercase text-slate-500">Lock Selection</span>
+                      </div>
+                    </div>
+                    <select name="defaultQuantity" value={formData.defaultQuantity} onChange={(e: any) => setFormData({...formData, defaultQuantity: e.target.value})} className="block w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 py-3 px-4 text-xs font-bold text-slate-900 dark:text-white">
+                        <option value="">Choose Default</option>
+                        {availableQuantities.length > 0 ? (
+                          availableQuantities.map(q => <option key={q} value={q}>{q}</option>)
+                        ) : (
+                          <>
+                            <option value="100">100</option>
+                            <option value="250">250</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
+                          </>
+                        )}
                     </select>
+                    <input 
+                      type="text" 
+                      placeholder="Available Quantities (comma separated)" 
+                      value={quantitiesInput} 
+                      onChange={(e) => {
+                        setQuantitiesInput(e.target.value);
+                        setAvailableQuantities(e.target.value.split(",").map(v => v.trim()).filter(v => !isNaN(Number(v))).map(Number));
+                      }}
+                      className="block w-full rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 py-3 px-4 text-xs font-bold text-slate-900 dark:text-white" 
+                    />
                   </div>
+                </div>
+              </div>
+
+              {/* Quantity Discount Section */}
+              <div className="space-y-6 pt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1 w-4 bg-secondary rounded-full shadow-[0_0_10px_rgba(243,119,33,0.3)]" />
+                    <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Bulk Purchase Discounts</h3>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={addDiscountTier}
+                    className="flex items-center gap-2 px-4 py-2 bg-primary dark:bg-slate-800 text-white dark:text-primary rounded-xl transition-all text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:-translate-y-0.5 border border-primary/20"
+                  >
+                    <Plus size={14} /> Add Discount Tier
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {quantityDiscounts.length > 0 ? (
+                    quantityDiscounts.map((tier, idx) => (
+                      <div key={idx} className="flex flex-wrap sm:flex-nowrap items-end gap-6 p-6 bg-slate-50/50 dark:bg-slate-950/50 rounded-3xl border border-slate-100 dark:border-slate-800 animate-in slide-in-from-left-4 duration-500 group/tier">
+                        <div className="flex-1 space-y-2">
+                          <label className="text-[9px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] ml-1">Threshold Quantity</label>
+                          <div className="relative">
+                            <input 
+                              type="number" 
+                              value={tier.minQuantity} 
+                              onChange={(e) => handleDiscountChange(idx, 'minQuantity', e.target.value)}
+                              className="block w-full rounded-[1.25rem] border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 py-3.5 px-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-4 focus:ring-primary/5 transition-all outline-none"
+                              placeholder="e.g. 100"
+                            />
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-300 uppercase tracking-widest">Units</div>
+                          </div>
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <label className="text-[9px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] ml-1">Discount Rate (%)</label>
+                          <div className="relative">
+                            <input 
+                              type="number" 
+                              value={tier.discountPercentage} 
+                              onChange={(e) => handleDiscountChange(idx, 'discountPercentage', e.target.value)}
+                              className="block w-full rounded-[1.25rem] border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 py-3.5 px-6 text-sm font-bold text-slate-900 dark:text-white focus:ring-4 focus:ring-primary/5 transition-all outline-none"
+                              placeholder="e.g. 10"
+                            />
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-black text-emerald-500">%</div>
+                          </div>
+                        </div>
+                        <button 
+                          type="button" 
+                          onClick={() => removeDiscountTier(idx)}
+                          className="p-4 bg-white dark:bg-slate-800 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all shadow-sm border border-slate-100 dark:border-slate-800 mb-[2px] active:scale-95"
+                          title="Remove Tier"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-16 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[2.5rem] bg-slate-50/20 dark:bg-slate-950/10">
+                      <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4 text-slate-300">
+                        <RefreshCw size={24} />
+                      </div>
+                      <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">No volume discounts configured</p>
+                      <p className="text-[10px] font-bold text-slate-400/40 uppercase tracking-widest mt-2">Incentivize bulk orders by adding discount tiers.</p>
+                    </div>
+                  )}
                 </div>
               </div>
 

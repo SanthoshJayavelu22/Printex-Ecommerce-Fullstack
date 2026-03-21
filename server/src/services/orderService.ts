@@ -35,16 +35,30 @@ class OrderService {
                 throw new ErrorResponse('Cart contains invalid/deleted products', 400);
             }
 
-            const itemTotal = item.quantity * item.product.price;
+            // Calculate discounted price if applicable based on bulk purchase discounts
+            const basePrice = item.product.price;
+            const quantity = item.quantity;
+            
+            // Find highest applicable discount tier
+            const applicableDiscount = (item.product.quantityDiscounts || [])
+                .filter((d: any) => quantity >= d.minQuantity)
+                .sort((a: any, b: any) => b.minQuantity - a.minQuantity)[0];
+                
+            const discountRate = applicableDiscount ? applicableDiscount.discountPercentage : 0;
+            const discountedPrice = basePrice * (1 - discountRate / 100);
+
+            const itemTotal = quantity * discountedPrice;
             totalAmount += itemTotal;
 
             orderItems.push({
                 product: item.product._id,
                 name: item.product.name,
                 quantity: item.quantity,
-                price: item.product.price,
+                price: discountedPrice, // Use the discounted price for the order records
                 selectedSize: item.selectedSize,
-                selectedFinish: item.selectedFinish,
+                selectedShape: item.selectedShape,
+                selectedMaterial: item.selectedMaterial || item.selectedFinish,
+                selectedFinish: item.selectedFinish || item.selectedMaterial,
                 image: item.product.images?.[0]
             });
         }

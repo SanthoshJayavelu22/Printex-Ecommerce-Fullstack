@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
 import DesignUploadModal from "@/components/DesignUploadModal";
+import MaterialSelector from "@/components/MaterialSelector";
 import { fetchApi, getImageUrl } from "@/lib/api";
 
 if (typeof window !== "undefined") {
@@ -30,7 +31,8 @@ export default function ProductClientDetails({ product }: { product: any }) {
   const [shape, setShape] = useState(product.defaultShape || "Round");
   const [size, setSize] = useState(product.defaultSize || "2in x 2in");
   const [quantity, setQuantity] = useState(product.defaultQuantity || 100);
-  const [material, setMaterial] = useState(product.defaultMaterial || "Standard");
+  const [material, setMaterial] = useState("");
+  const [materialError, setMaterialError] = useState(false);
 
   // Real review and wishlist state
   const [reviews, setReviews] = useState<any[]>([]);
@@ -43,10 +45,21 @@ export default function ProductClientDetails({ product }: { product: any }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [purchaseLoading, setPurchaseLoading] = useState(false);
 
-  // Price calculation
-  const unitPriceValue = product.price || 0.95;
-  const totalPrice = (unitPriceValue * quantity).toFixed(2);
-  const unitPrice = unitPriceValue.toFixed(2);
+  // Price calculation with dynamic volume discounts
+  const baseUnitPrice = product.price || 0.95;
+  
+  // Find the highest applicable discount tier for the current quantity
+  const applicableDiscount = (product.quantityDiscounts || [])
+    .filter((d: any) => quantity >= d.minQuantity)
+    .sort((a: any, b: any) => b.minQuantity - a.minQuantity)[0];
+
+  const discountRate = applicableDiscount ? applicableDiscount.discountPercentage : 0;
+  const discountedUnitPrice = baseUnitPrice * (1 - discountRate / 100);
+  
+  const totalPrice = (discountedUnitPrice * quantity).toFixed(2);
+  const unitPrice = discountedUnitPrice.toFixed(2);
+  const originalPrice = (baseUnitPrice * quantity).toFixed(2);
+  const isDiscounted = discountRate > 0;
 
   const fetchReviews = async () => {
     try {
@@ -116,6 +129,13 @@ export default function ProductClientDetails({ product }: { product: any }) {
   };
 
   const handleCheckoutClick = () => {
+    if (!material) {
+        setMaterialError(true);
+        // Scroll to material selector or just show alert
+        alert("Please select a material before proceeding.");
+        return;
+    }
+    setMaterialError(false);
     setIsModalOpen(true);
   };
 
@@ -127,11 +147,13 @@ export default function ProductClientDetails({ product }: { product: any }) {
         productId: product._id,
         quantity,
         selectedSize: size,
+        selectedShape: shape,
+        selectedMaterial: material,
         selectedFinish: material,
         needsDesign: !designFile
       };
       sessionStorage.setItem('pending_cart_item', JSON.stringify(config));
-      router.push('/login');
+      router.push(`/login?redirect=/product/${product.slug}`);
       return;
     }
 
@@ -141,6 +163,8 @@ export default function ProductClientDetails({ product }: { product: any }) {
       formData.append('productId', product._id);
       formData.append('quantity', quantity.toString());
       formData.append('selectedSize', size);
+      formData.append('selectedShape', shape);
+      formData.append('selectedMaterial', material);
       formData.append('selectedFinish', material);
 
       if (designFile) {
@@ -179,9 +203,9 @@ export default function ProductClientDetails({ product }: { product: any }) {
   }, { scope: containerRef });
 
   return (
-    <div ref={containerRef} className="pt-48 pb-20 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div ref={containerRef} className="pt-36 pb-20 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
       
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 mb-8 text-xs font-semibold text-slate-500 overflow-x-auto whitespace-nowrap pb-2 lowercase tracking-wider">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 mb-4 text-xs font-semibold text-slate-500 overflow-x-auto whitespace-nowrap pb-1 lowercase tracking-wider">
         <Link href="/" className="hover:text-black transition-colors">Home</Link>
         <ChevronRight size={10} className="text-slate-300" />
         {product.categories?.[0] ? (
@@ -211,7 +235,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
             </div>
             
             {/* Reviews Under Title */}
-            <div className="flex items-center gap-2 mb-6">
+            <div className="flex items-center gap-2 mb-4">
                 <div className="flex items-center text-[#f7b500]">
                     {[...Array(5)].map((_, i) => <Star key={i} size={16} fill={i < 4 ? "currentColor" : "none"} className={i===4 ? "text-slate-300" : ""} />)}
                 </div>
@@ -236,8 +260,8 @@ export default function ProductClientDetails({ product }: { product: any }) {
                 )}
                 
                 {/* Main Image */}
-                <div className="flex-1 bg-[#F9ECE3] rounded-xl overflow-hidden relative flex items-center justify-center min-h-[300px] sm:min-h-[500px]">
-                    <button className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-colors">
+                <div className="flex-1 bg-[#F9ECE3] rounded-xl overflow-hidden relative flex items-center justify-center min-h-[300px] sm:min-h-[420px]">
+                    <button className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-colors z-20">
                         <ChevronLeft size={20} className="text-slate-600"/>
                     </button>
                     {activeImage ? (
@@ -245,7 +269,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
                     ) : (
                         <div className="text-slate-400">No Image Available</div>
                     )}
-                    <button className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-colors">
+                    <button className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-colors z-20">
                         <ChevronRight size={20} className="text-slate-600"/>
                     </button>
                 </div>
@@ -487,7 +511,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
 
         {/* Right Side Sticky Calculator Widget */}
         <div className="w-full lg:w-2/5 xl:w-[35%] relative">
-            <div className="lg:sticky lg:top-8 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100 overflow-hidden flex flex-col max-h-[calc(100vh-2rem)]">
+            <div className="lg:sticky lg:top-8 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100 flex flex-col max-h-[calc(100vh-2rem)]">
                  
                  {/* Internal Scrollable Content */}
                  <div className="p-6 md:p-8 flex-1 overflow-y-auto hide-scrollbar">
@@ -502,17 +526,23 @@ export default function ProductClientDetails({ product }: { product: any }) {
                          <div className="flex items-center justify-between flex-wrap gap-2">
                              <label className="text-sm font-bold text-slate-700 w-1/3">Select Shape</label>
                              <div className="relative flex-1 min-w-[200px]">
-                                 <select 
-                                     value={shape} 
-                                     onChange={(e) => setShape(e.target.value)} 
-                                     className="w-full appearance-none bg-white border border-slate-200 rounded-lg py-3 px-4 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer disabled:bg-slate-50 disabled:cursor-not-allowed"
-                                     disabled={!!product.defaultShape}
-                                 >
-                                     <option value="Round">Round</option>
-                                     <option value="Square / Rectangle">Square / Rectangle</option>
-                                     <option value="Oval">Oval</option>
-                                     <option value="Custom/Any Shape">Custom/Any Shape</option>
-                                 </select>
+                                  <select 
+                                      value={shape} 
+                                      onChange={(e) => setShape(e.target.value)} 
+                                      className="w-full appearance-none bg-white border border-slate-200 rounded-lg py-3 px-4 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer disabled:bg-slate-50 disabled:cursor-not-allowed"
+                                      disabled={product.fixedShape}
+                                  >
+                                      {product.availableShapes && product.availableShapes.length > 0 ? (
+                                          product.availableShapes.map((s: string) => <option key={s} value={s}>{s}</option>)
+                                      ) : (
+                                          <>
+                                              <option value="Round">Round</option>
+                                              <option value="Square / Rectangle">Square / Rectangle</option>
+                                              <option value="Oval">Oval</option>
+                                              <option value="Custom/Any Shape">Custom/Any Shape</option>
+                                          </>
+                                      )}
+                                  </select>
                                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
                              </div>
                          </div>
@@ -527,70 +557,91 @@ export default function ProductClientDetails({ product }: { product: any }) {
                                      value={size} 
                                      onChange={(e) => setSize(e.target.value)} 
                                      className="w-full appearance-none bg-white border border-slate-200 rounded-lg py-3 px-4 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer disabled:bg-slate-50 disabled:cursor-not-allowed"
-                                     disabled={!!product.defaultSize}
+                                     disabled={product.fixedSize}
                                  >
-                                     <option value="2in x 2in">2in x 2in</option>
-                                     <option value="3in x 3in">3in x 3in</option>
-                                     <option value="4in x 4in">4in x 4in</option>
-                                     <option value="Custom Size">Custom Size</option>
+                                     {product.availableSizes && product.availableSizes.length > 0 ? (
+                                         product.availableSizes.map((s: string) => <option key={s} value={s}>{s}</option>)
+                                     ) : (
+                                         <>
+                                             <option value="2in x 2in">2in x 2in</option>
+                                             <option value="3in x 3in">3in x 3in</option>
+                                             <option value="4in x 4in">4in x 4in</option>
+                                             <option value="Custom Size">Custom Size</option>
+                                         </>
+                                     )}
                                  </select>
                                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
                              </div>
                          </div>
+
+                         {/* Bulk Discount Tiers Table */}
+                         {product.quantityDiscounts && product.quantityDiscounts.length > 0 && (
+                            <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 animate-in fade-in duration-500 mb-5">
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                                   <Plus size={10} className="text-primary" /> Volume Discount Tiers
+                                </p>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {[...product.quantityDiscounts].sort((a: any, b: any) => a.minQuantity - b.minQuantity).map((tier: any, idx: number) => (
+                                        <div 
+                                          key={idx} 
+                                          className={`flex items-center justify-between px-3 py-2 rounded-xl border-2 transition-all ${
+                                            quantity >= tier.minQuantity 
+                                              ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-[1.02]' 
+                                              : 'bg-white border-slate-100 text-slate-600'
+                                          }`}
+                                        >
+                                            <span className="text-[10px] font-black">{tier.minQuantity}+ Units</span>
+                                            <span className={`text-[10px] font-black ${quantity >= tier.minQuantity ? 'text-white' : 'text-emerald-500'}`}>{tier.discountPercentage}% OFF</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                         )}
 
                          {/* Quantity */}
                          <div className="flex items-center justify-between flex-wrap gap-2">
                              <label className="text-sm font-bold text-slate-700 w-1/3">Quantity</label>
                              <div className="relative flex-1 min-w-[200px]">
                                  <select 
-                                     value={quantity} 
-                                     onChange={(e) => setQuantity(Number(e.target.value))} 
-                                     className="w-full appearance-none bg-white border border-slate-200 rounded-lg py-3 px-4 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer text-right pl-12 disabled:bg-slate-50 disabled:cursor-not-allowed"
-                                     disabled={!!product.defaultQuantity}
-                                 >
-                                     <option value={25}>25</option>
-                                     <option value={50}>50</option>
-                                     <option value={100}>100</option>
-                                     <option value={250}>250</option>
-                                     <option value={500}>500</option>
-                                     <option value={1000}>1000</option>
-                                 </select>
+                                      value={quantity} 
+                                      onChange={(e) => setQuantity(Number(e.target.value))} 
+                                      className="w-full appearance-none bg-white border border-slate-200 rounded-lg py-3 px-4 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer text-right pl-12 disabled:bg-slate-50 disabled:cursor-not-allowed"
+                                      disabled={product.fixedQuantity}
+                                  >
+                                      {product.availableQuantities && product.availableQuantities.length > 0 ? (
+                                          product.availableQuantities.map((q: number) => <option key={q} value={q}>{q}</option>)
+                                      ) : (
+                                          <>
+                                              <option value={25}>25</option>
+                                              <option value={50}>50</option>
+                                              <option value={100}>100</option>
+                                              <option value={250}>250</option>
+                                              <option value={500}>500</option>
+                                              <option value={1000}>1000</option>
+                                          </>
+                                      )}
+                                  </select>
                                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
                              </div>
                          </div>
 
                          {/* Material Selection */}
                          <div className="pt-2">
-                             <label className="text-sm font-bold text-slate-700 mb-3 block uppercase tracking-widest">Select Material</label>
-                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-                                 {[
-                                     {n: "Paper", t: "Standard - Economical", img: "https://degqkf7c4iqz7.cloudfront.net/kraftixon/images/product_icon/Standard_-_Economical_1754563446075.jpeg"},
-                                     {n: "Water-Resist", t: "Thin Film (Indoor)", img: "https://degqkf7c4iqz7.cloudfront.net/kraftixon/images/product_icon/Thin_Film__Indoor_Use__1754563481303.jpeg"},
-                                     {n: "Transparent", t: "Transparent (Indoor)", img: "https://degqkf7c4iqz7.cloudfront.net/kraftixon/images/product_icon/Transparent__Indoor_Use__1754563522623.jpeg"},
-                                     {n: "Brown Kraft", t: "Kraft Paper", img: "https://degqkf7c4iqz7.cloudfront.net/kraftixon/images/product_icon/Kraft_Paper_1754563551231.jpeg"}
-                                 ].map(mat => (
-                                     <button 
-                                         key={mat.n} 
-                                         onClick={() => setMaterial(mat.t)} 
-                                         className={`flex flex-col rounded-xl border-2 overflow-hidden text-center transition-all bg-white group ${material === mat.t ? 'border-black ring-2 ring-black/5' : 'border-slate-200 hover:border-slate-300'}`}
-                                     >
-                                         <div className="aspect-square bg-slate-100 p-2 relative flex items-center justify-center">
-                                             <img src={mat.img} alt={mat.n} className="w-full h-full object-cover rounded shadow-sm" />
-                                             <div className="absolute top-1 right-1">
-                                                 {material === mat.t && <CheckCircle2 size={16} className="text-black bg-white rounded-full" />}
-                                             </div>
-                                         </div>
-                                         <div className="p-2 bg-slate-50 flex-1 flex flex-col items-center justify-center">
-                                             <span className={`text-[10px] font-black uppercase leading-tight ${material === mat.t ? 'text-black' : 'text-slate-800'}`}>{mat.n}</span>
-                                         </div>
-                                     </button>
-                                 ))}
-                             </div>
+                             <MaterialSelector 
+                                selected={material} 
+                                onSelect={(val) => {
+                                    setMaterial(val);
+                                    setMaterialError(false);
+                                }} 
+                                error={materialError}
+                                availableMaterials={product.availableMaterials}
+                                disabled={product.fixedMaterial}
+                             />
                          </div>
 
-                         {/* Form End */}
-
-                     </div>
+                          {/* Form End */}
+                          <div className="h-40" />
+                      </div>
                  </div>
 
                   {/* Sticky Footer: Total & Checkout Button */}
@@ -602,8 +653,24 @@ export default function ProductClientDetails({ product }: { product: any }) {
                              </span>
                           </div>
                           <div className="text-right">
-                              <div className="text-3xl font-black text-black italic">₹{totalPrice}</div>
-                              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Unit: ₹{unitPrice}</div>
+                              {isDiscounted ? (
+                                <>
+                                  <div className="flex items-center justify-end gap-2 mb-1">
+                                    <span className="text-[10px] font-black text-white bg-emerald-500 px-2 py-0.5 rounded-full uppercase tracking-tighter">Save {discountRate}%</span>
+                                    <span className="text-sm font-bold text-slate-400 line-through">₹{originalPrice}</span>
+                                  </div>
+                                  <div className="text-4xl font-black text-black italic">₹{totalPrice}</div>
+                                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5 flex flex-col">
+                                     <span>Unit: ₹{unitPrice}</span>
+                                     <span className="text-emerald-500 font-black">Applied Bulk Discount</span>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="text-3xl font-black text-black italic">₹{totalPrice}</div>
+                                  <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Unit: ₹{unitPrice}</div>
+                                </>
+                              )}
                           </div>
                       </div>
                       <button 
@@ -616,21 +683,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
                   </div>
             </div>
 
-            {/* Price Estimation Share / Download block mimicking the original reference */}
-            <div className="mt-4 bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-                <p className="text-xs text-slate-500 font-medium mb-3">Easily send-receive product estimation via email or download it as PDF.</p>
-                <div className="flex gap-2">
-                    <div className="flex-1 flex">
-                        <input type="email" placeholder="Email ID" className="flex-1 min-w-0 bg-slate-50 border border-slate-200 text-sm rounded-l-lg px-3 py-2 outline-none focus:border-primary" />
-                        <button className="bg-primary hover:brightness-110 text-white text-xs font-bold px-4 py-2 rounded-r-lg transition-colors flex items-center gap-2">
-                            Send <Send size={12} />
-                        </button>
-                    </div>
-                    <button className="w-10 h-10 border border-slate-200 rounded-lg flex flex-col items-center justify-center text-slate-500 hover:bg-slate-50 hover:text-secondary transition-colors">
-                        <Download size={16} />
-                    </button>
-                </div>
-            </div>
+           
 
         </div>
 

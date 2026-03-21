@@ -128,7 +128,7 @@ export default function AdminLogin() {
       </div>
 
       <div className="fixed bottom-8 left-0 right-0 text-center text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.4em] z-10 opacity-50">
-        &copy; {new Date().getFullYear()} Printex Labels
+        &copy; {new Date().getFullYear()} Printix Labels
       </div>
     </div>
   );

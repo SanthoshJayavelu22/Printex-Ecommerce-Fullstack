@@ -6,7 +6,9 @@ export interface IOrderItem {
     quantity: number;
     price: number;
     selectedSize?: string;
-    selectedFinish?: string;
+    selectedShape?: string;
+    selectedMaterial?: string;
+    selectedFinish?: string; // Keep for legacy compatibility
     image?: string;
     designUrl?: string;
     needsDesign: boolean;
@@ -67,6 +69,8 @@ const orderSchema: Schema<IOrder> = new Schema({
         quantity: { type: Number, required: true },
         price: { type: Number, required: true },
         selectedSize: { type: String },
+        selectedShape: { type: String },
+        selectedMaterial: { type: String },
         selectedFinish: { type: String },
         image: { type: String },
         designUrl: { type: String },

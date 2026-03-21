@@ -8,7 +8,7 @@ import ErrorResponse  from '../utils/errorResponse';
 export const getCart = async (userId: string) => {
     const cart: any = await Cart.findOne({ user: userId }).populate({
         path: 'items.product',
-        select: 'name price images stock isDeleted minOrderQuantity'
+        select: 'name price images stock isDeleted minOrderQuantity quantityDiscounts'
     });
 
     if (!cart) {
@@ -31,7 +31,19 @@ export const getCart = async (userId: string) => {
             };
         }
 
-        const itemTotal = item.quantity * item.product.price;
+        // Calculate discounted price if applicable based on bulk purchase discounts
+        const basePrice = item.product.price;
+        const quantity = item.quantity;
+        
+        // Find highest applicable discount tier
+        const applicableDiscount = (item.product.quantityDiscounts || [])
+            .filter((d: any) => quantity >= d.minQuantity)
+            .sort((a: any, b: any) => b.minQuantity - a.minQuantity)[0];
+            
+        const discountRate = applicableDiscount ? applicableDiscount.discountPercentage : 0;
+        const discountedPrice = basePrice * (1 - discountRate / 100);
+        
+        const itemTotal = quantity * discountedPrice;
         bill += itemTotal;
         totalItems += item.quantity;
 
@@ -55,7 +67,7 @@ export const getCart = async (userId: string) => {
  * Add item to cart
  */
 export const addToCart = async (userId: string, itemData: any) => {
-    const { productId, quantity, selectedSize, selectedFinish } = itemData;
+    const { productId, quantity, selectedSize, selectedShape, selectedMaterial, selectedFinish } = itemData;
 
     if (!quantity || quantity < 1) {
         throw new ErrorResponse('Quantity must be at least 1', 400);
@@ -94,7 +106,8 @@ export const addToCart = async (userId: string, itemData: any) => {
     const itemIndex = cart.items.findIndex((item: any) => 
         item.product.toString() === productId && 
         item.selectedSize === selectedSize &&
-        item.selectedFinish === selectedFinish &&
+        item.selectedShape === selectedShape &&
+        (item.selectedMaterial === selectedMaterial || item.selectedFinish === selectedFinish) &&
         item.designUrl === itemData.designUrl &&
         item.needsDesign === itemData.needsDesign
     );
@@ -110,7 +123,9 @@ export const addToCart = async (userId: string, itemData: any) => {
             product: productId as any,
             quantity,
             selectedSize,
-            selectedFinish,
+            selectedShape,
+            selectedMaterial: selectedMaterial || selectedFinish,
+            selectedFinish: selectedFinish || selectedMaterial,
             designUrl: itemData.designUrl,
             needsDesign: itemData.needsDesign
         });

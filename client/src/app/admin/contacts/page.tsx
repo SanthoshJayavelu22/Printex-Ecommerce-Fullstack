@@ -67,21 +67,21 @@ export default function AdminContacts() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-2">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="h-8 w-1.5 bg-indigo-600 rounded-full" />
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Customer Inquiries</h1>
+            <span className="h-8 w-1.5 bg-primary rounded-full shadow-[0_0_10px_rgba(37,68,65,0.3)]" />
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Communication Terminal</h1>
           </div>
-          <p className="text-slate-500 dark:text-slate-400 font-medium text-sm ml-3.5">Manage messages from the Contact Us form.</p>
+          <p className="text-slate-500 dark:text-slate-400 font-medium text-sm ml-3.5">Manage incoming correspondences and client relations.</p>
         </div>
         <div className="flex items-center gap-3 bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
           <button 
             onClick={() => setFilter("all")}
-            className={`px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${filter === 'all' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+            className={`px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${filter === 'all' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
           >
             All Incoming
           </button>
           <button 
             onClick={() => setFilter("unread")}
-            className={`px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${filter === 'unread' ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+            className={`px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${filter === 'unread' ? 'bg-secondary text-white shadow-lg shadow-secondary/20' : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
           >
             Unread {inquiries.filter(i => !i.isRead).length > 0 && `(${inquiries.filter(i => !i.isRead).length})`}
           </button>
@@ -119,12 +119,12 @@ export default function AdminContacts() {
                     }`}
                    >
                      {!inquiry.isRead && (
-                       <div className="absolute top-6 right-6 h-2 w-2 bg-indigo-600 rounded-full animate-pulse shadow-[0_0_10px_rgba(79,70,229,0.8)]" />
+                       <div className="absolute top-6 right-6 h-2 w-2 bg-secondary rounded-full animate-pulse shadow-[0_0_10px_rgba(243,119,33,0.8)]" />
                      )}
                      <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between">
                            <div className="flex items-center gap-2">
-                             <div className={`h-8 w-8 rounded-lg flex items-center justify-center text-xs font-black ${inquiry.isRead ? 'bg-slate-100 text-slate-400 dark:bg-slate-800' : 'bg-indigo-600 text-white'}`}>
+                             <div className={`h-8 w-8 rounded-lg flex items-center justify-center text-xs font-black ${inquiry.isRead ? 'bg-slate-100 text-slate-400 dark:bg-slate-800' : 'bg-primary text-white'}`}>
                                {inquiry.name.charAt(0)}
                              </div>
                              <span className={`text-xs font-black uppercase tracking-widest ${inquiry.isRead ? 'text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-white'}`}>{inquiry.name}</span>

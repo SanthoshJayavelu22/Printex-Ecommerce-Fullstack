@@ -6,9 +6,9 @@ import sendEmail from '../utils/sendEmail';
 export const sendWelcomeEmail = async (user: any) => {
     await sendEmail({
         email: user.email,
-        subject: 'Welcome to Printex Labels!',
-        message: `Hello ${user.name},\n\nThank you for joining Printex Labels. We are excited to have you with us!`,
-        html: `<h1>Welcome to Printex Labels!</h1><p>Hello ${user.name},</p><p>Thank you for joining Printex Labels. We are excited to have you with us!</p>`
+        subject: 'Welcome to Printix Labels!',
+        message: `Hello ${user.name},\n\nThank you for joining Printix Labels. We are excited to have you with us!`,
+        html: `<h1>Welcome to Printix Labels!</h1><p>Hello ${user.name},</p><p>Thank you for joining Printix Labels. We are excited to have you with us!</p>`
     });
 };
 

@@ -7,11 +7,11 @@ const settingsSchema = new mongoose.Schema({
     },
     storeName: {
         type: String,
-        default: 'Printex Labels'
+        default: 'Printix Labels'
     },
     contactEmail: {
         type: String,
-        default: 'contact@printexlabels.com'
+        default: 'contact@printixlabels.com'
     },
     contactPhone: {
         type: String,
@@ -28,13 +28,13 @@ const settingsSchema = new mongoose.Schema({
         linkedin: { type: String, default: 'https://linkedin.com' }
     },
     seo: {
-        metaTitle: { type: String, default: 'Printex Labels - Premium Custom Sticker Printing' },
+        metaTitle: { type: String, default: 'Printix Labels - Premium Custom Sticker Printing' },
         metaDescription: { type: String, default: 'Get high quality custom stickers and labels delivered to your doorstep.' },
         metaKeywords: { type: String, default: 'stickers, labels, custom printing, India, ecommerce' }
     },
     footerText: {
         type: String,
-        default: '© 2026 Printex Labels. All Rights Reserved.'
+        default: '© 2026 Printix Labels. All Rights Reserved.'
     },
     maintenanceMode: {
         type: Boolean,

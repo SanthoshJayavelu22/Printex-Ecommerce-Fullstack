@@ -46,7 +46,7 @@ export default function HowItWorks() {
   }, [])
 
   return (
-    <section className="py-16 md:py-24 bg-black text-white relative overflow-hidden" ref={containerRef}>
+    <section className="py-16 md:py-24 bg-gray-800 text-white relative overflow-hidden" ref={containerRef}>
       {/* Background decorations */}
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-white/[0.02] rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
       <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
@@ -57,7 +57,7 @@ export default function HowItWorks() {
             Simple Process
           </div>
           <h2 className="text-5xl md:text-7xl lg:text-[6rem] font-black uppercase tracking-tighter mb-8 leading-[0.85] text-balance">
-            From Screen <br /> <span className="text-white/30">To Sticker.</span>
+            From Screen <br /> <span className="text-white/60">To Sticker.</span>
           </h2>
         </div>
 
@@ -68,7 +68,7 @@ export default function HowItWorks() {
                 <span className="text-3xl sm:text-4xl font-black italic tracking-tighter">{step.number}</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight mb-4 group-hover:text-gray-300 transition-colors duration-300">{step.title}</h3>
-              <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px] leading-relaxed max-w-[200px] group-hover:text-gray-400 transition-colors duration-300">
+              <p className="text-gray-300 font-bold uppercase tracking-widest text-[10px] leading-relaxed max-w-[200px] group-hover:text-white transition-colors duration-300">
                 {step.desc}
               </p>
             </div>

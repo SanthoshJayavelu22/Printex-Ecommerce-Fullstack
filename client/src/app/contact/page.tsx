@@ -59,7 +59,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email Support</p>
-                     <p className="font-black text-slate-900 dark:text-white italic">{settings?.contactEmail || 'support@printexlabels.com'}</p>
+                     <p className="font-black text-slate-900 dark:text-white italic">{settings?.contactEmail || 'support@printixlabels.com'}</p>
                   </div>
                </div>
                <div className="flex gap-6 items-center">

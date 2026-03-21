@@ -9,7 +9,7 @@ import { useCart } from '@/contexts/CartContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useSettings } from '@/contexts/SettingsContext'
-import logo from '../../public/images/printex-labels-logo.png'
+import logo from '../../public/images/printix-labels-logo.png'
 
 export default function Header() {
   const { settings } = useSettings()
@@ -40,7 +40,7 @@ export default function Header() {
     <header className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-700`}>
       {/* Topbar */}
       <div className={`bg-primary text-white transition-all duration-700 overflow-hidden ${isScrolled ? 'h-0 py-0 opacity-0' : 'h-auto py-2 opacity-100'} hidden lg:block text-[10px] font-black uppercase tracking-widest`}>
-        <div className="max-w-9xl mx-auto px-6 md:px-12 xl:px-24 flex justify-between items-center">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-12 xl:px-24 flex justify-between items-center">
           <div className="flex items-center gap-6 xl:gap-8">
             <span className="flex items-center gap-2"><PackageOpen size={14} className="text-gray-400" /> Free Shipping above ₹1499</span>
             <span className="flex items-center gap-2"><Zap size={14} className="text-gray-400" /> Fast Dispatch</span>
@@ -50,24 +50,24 @@ export default function Header() {
             <a href={`tel:${settings?.contactPhone || '+91 98765 43210'}`} className="flex items-center gap-2 hover:text-gray-300">
                <Phone size={14} className="text-gray-400" /> {settings?.contactPhone || '+91 98765 43210'}
             </a>
-            <a href={`mailto:${settings?.contactEmail || 'info@printexlabels.com'}`} className="flex items-center gap-2 hover:text-gray-300">
-               <Mail size={14} className="text-gray-400" /> {settings?.contactEmail || 'info@printexlabels.com'}
+            <a href={`mailto:${settings?.contactEmail || 'info@printixlabels.com'}`} className="flex items-center gap-2 hover:text-gray-300">
+               <Mail size={14} className="text-gray-400" /> {settings?.contactEmail || 'info@printixlabels.com'}
             </a>
           </div>
         </div>
       </div>
 
       <div className={`transition-all duration-700 ${isScrolled ? 'py-1' : 'py-3'}`}>
-        <div className="max-w-9xl mx-auto px-6 md:px-12 xl:px-24">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-12 xl:px-24">
           <div className={`rounded-full px-6 md:px-8 py-1.5 md:py-2 flex items-center justify-between transition-all duration-700 border border-white/10 shadow-2xl overflow-visible backdrop-blur-xl bg-primary text-white`}>
             <Link href="/" className="text-2xl font-black tracking-tighter text-white uppercase flex items-center gap-3 group">
               {
               settings?.logo ? 
               (
-                <img src={settings.logo} alt={settings.storeName} className="h-10 w-auto object-contain" />
+                <img src={settings.logo} alt={settings.storeName} className="h-10 w-auto object-contain mr-5" />
               ) : 
               (
-                 <>{settings?.storeName || 'Printex Labels'}<span className="text-gray-400 group-hover:text-black transition-colors duration-500">.</span></>
+                 <>{settings?.storeName || 'Printix Labels'}<span className="text-gray-400 group-hover:text-black transition-colors duration-500">.</span></>
               )}
             </Link>
 
@@ -106,7 +106,7 @@ export default function Header() {
                 </button>
                 
                 {/* Dropdown Menu */}
-                <div className="absolute top-full right-0 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover/user:opacity-100 group-hover/user:translate-y-0 group-hover/user:pointer-events-auto transition-all duration-300 z-50">
+                <div className="absolute top-full right-0 pt-2 opacity-0 pointer-events-none group-hover/user:opacity-100 group-hover/user:pointer-events-auto transition-all duration-300 z-50">
                   <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 min-w-[180px]">
                     <div className="border-b border-slate-50 pb-3 mb-3 px-2">
                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Signed in as</p>
@@ -121,6 +121,11 @@ export default function Header() {
                       <li>
                         <Link href="/orders" className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-secondary transition-all">
                           Order History
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/wishlist" className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-secondary transition-all">
+                          My Wishlist
                         </Link>
                       </li>
                       <li>

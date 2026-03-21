@@ -23,12 +23,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Enable CORS
 const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
   "http://localhost:3000",
   "http://localhost:3001",
+  "http://localhost:5500",
   "http://127.0.0.1:5173",
   "http://127.0.0.1:3000",
+  "http://127.0.0.1:5500",
 ];
 
 const corsOptions: cors.CorsOptions = {
@@ -73,7 +73,7 @@ app.use('/public', express.static(path.join(__dirname, '../public')));
 app.use('/api', routes);
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Printex Labels API is running...');
+    res.send('Printix Labels API is running...');
 });
 
 // Global Error Handler

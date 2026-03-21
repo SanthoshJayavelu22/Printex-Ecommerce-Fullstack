@@ -53,6 +53,12 @@ export default function CheckoutPage() {
   }, [cart, cartLoading, router]);
 
   useEffect(() => {
+    if (!user && !cartLoading) {
+      router.push('/login?redirect=/checkout');
+    }
+  }, [user, cartLoading, router]);
+
+  useEffect(() => {
     if (user?.addresses?.length) {
       setSelectedAddress(user.addresses.find((a: any) => a.isDefault) || user.addresses[0]);
       setShowAddressForm(false);
@@ -148,7 +154,7 @@ export default function CheckoutPage() {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
           amount: razorpayOrder.amount,
           currency: razorpayOrder.currency,
-          name: "Printex Labels",
+          name: "Printix Labels",
           description: "Order Payment",
           order_id: razorpayOrder.id,
           handler: async function (response: any) {
@@ -409,8 +415,12 @@ export default function CheckoutPage() {
                           </div>
                           <div className="flex-1">
                             <p className="font-bold text-sm uppercase tracking-tight">{item.product?.name}</p>
-                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                              {item.selectedSize} • {item.selectedFinish}
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5 flex-wrap">
+                              {item.selectedShape && <span>{item.selectedShape}</span>}
+                              {item.selectedShape && <span>•</span>}
+                              <span>{item.selectedSize}</span>
+                              <span>•</span>
+                              <span>{item.selectedMaterial || item.selectedFinish}</span>
                             </p>
                             {item.needsDesign && (
                               <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full">Pro Design Needed</span>
