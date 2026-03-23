@@ -18,7 +18,7 @@ const generateToken = (id: string | any) => {
  * Register a new user
  */
 export const registerUser = async (userData: any) => {
-    const { name, email, password, role } = userData;
+    const { name, email, password, role, phoneNumber } = userData;
 
     // Check if user exists
     const userExists = await User.findOne({ email });
@@ -31,6 +31,7 @@ export const registerUser = async (userData: any) => {
         name,
         email,
         password,
+        phoneNumber,
         role: role || 'user'
     });
 

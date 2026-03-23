@@ -8,16 +8,16 @@ interface EmailOptions {
 }
 
 const sendEmail = async (options: EmailOptions): Promise<void> => {
-    if (!process.env.SMTP_HOST || !process.env.SMTP_USER) {
+    if (!process.env.EMAIL_HOST || !process.env.EMAIL_USER) {
         console.error('SMTP configuration is missing from .env. Email not sent.');
         return;
     }
     const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT),
+        host: process.env.EMAIL_HOST,
+        port: Number(process.env.EMAIL_PORT),
         auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
         }
     } as any);
 
