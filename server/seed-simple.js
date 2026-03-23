@@ -1,11 +1,15 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const slugify = require('slugify');
-
-// Compiled models (assuming they are in dist)
-let Category, Product;
+const fs = require('fs');
 
 dotenv.config({ path: './.env' });
+
+const logFile = 'seed-log.txt';
+function log(msg) {
+    console.log(msg);
+    fs.appendFileSync(logFile, msg + '\n');
+}
 
 const data = [
   {
@@ -113,73 +117,76 @@ const data = [
 
 const makeSlug = (str) => slugify(str, { lower: true, strict: true, remove: /[*+~.()'"!:@&]/g });
 
-async function importData() {
+async function seed() {
     try {
-        console.log('Connecting to:', process.env.MONGO_URI);
+        fs.writeFileSync(logFile, 'SEEDING CALLED\n');
+        log('Connecting to: ' + process.env.MONGO_URI);
         await mongoose.connect(process.env.MONGO_URI);
-        console.log('Connected to MongoDB.');
+        log('Connected to MongoDB.');
 
-        // Load models
-        try {
-            const CatRes = require('./dist/models/Category');
-            Category = CatRes.default || CatRes;
-            const ProdRes = require('./dist/models/Product');
-            Product = ProdRes.default || ProdRes;
-        } catch (err) {
-            console.error('FAILED TO LOAD COMPILED MODELS. TRYING SCHEMA DEFINITION...');
-            // Fallback: Define simplest schemas if dist is broken
-            Category = mongoose.models.Category || mongoose.model('Category', new mongoose.Schema({
-                name: String, slug: String, parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' }, order: Number, isActive: { type: Boolean, default: true }
-            }));
-            Product = mongoose.models.Product || mongoose.model('Product', new mongoose.Schema({
-                name: String, slug: String, description: String, price: Number, categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }], stock: Number, images: [String], isActive: { type: Boolean, default: true }
-            }));
-        }
+        // Get models directly (Defining schemas to be safe if dist is missing)
+        const Category = mongoose.models.Category || mongoose.model('Category', new mongoose.Schema({
+            name: { type: String, required: true },
+            slug: { type: String, unique: true },
+            parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', default: null },
+            order: Number,
+            isActive: { type: Boolean, default: true }
+        }));
 
-        await Category.deleteMany();
-        await Product.deleteMany();
-        console.log('Database cleared.');
+        const Product = mongoose.models.Product || mongoose.model('Product', new mongoose.Schema({
+            name: { type: String, required: true },
+            slug: { type: String, unique: true },
+            description: String,
+            price: Number,
+            categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
+            stock: { type: Number, default: 0 },
+            isActive: { type: Boolean, default: true },
+            isDeleted: { type: Boolean, default: false },
+            images: [String]
+        }));
 
-        let orderL1 = 1;
+        log('Clearing existing data...');
+        await Category.deleteMany({});
+        await Product.deleteMany({});
+        log('Database cleared.');
+
         for (const l1 of data) {
-            console.log(`Working on ${l1.name}...`);
+            log('Seeding parent: ' + l1.name);
             const parentCat = await Category.create({
                 name: l1.name,
                 slug: makeSlug(l1.name),
-                order: orderL1++
+                order: 0
             });
 
-            let orderL2 = 1;
             for (const l2 of l1.subcategories) {
+                log('  Seeding sub: ' + l2.name);
                 const subCat = await Category.create({
                     name: l2.name,
-                    slug: makeSlug(l1.name + ' ' + l2.name),
+                    slug: makeSlug(l2.name), // Simpler slugs to avoid mismatch
                     parent: parentCat._id,
-                    order: orderL2++
+                    order: 0
                 });
-                
-                for (let i = 0; i < l2.items.length; i++) {
-                    const productName = l2.items[i];
+
+                for (const productName of l2.items) {
                     await Product.create({
                         name: productName,
-                        slug: makeSlug(l1.name + ' ' + l2.name + ' ' + productName),
-                        description: `Premium ${productName} suitable for all your needs. Custom printed with high-quality materials. Get a pack of 100 at an economical price.`,
-                        price: Math.floor(Math.random() * 500) + 50,
+                        slug: makeSlug(productName),
+                        description: `Premium ${productName}. Custom high-quality results.`,
+                        price: Math.floor(Math.random() * 500) + 100,
                         categories: [subCat._id, parentCat._id],
-                        stock: 500,
-                        images: [`https://via.placeholder.com/800x600?text=${encodeURIComponent(productName)}`],
-                        isActive: true
+                        stock: 1000,
+                        images: [`https://via.placeholder.com/800?text=${encodeURIComponent(productName)}`]
                     });
                 }
             }
         }
-        
-        console.log('Kraftix Data Imported successfully');
+
+        log('SEEDING COMPLETE!');
         process.exit(0);
     } catch (err) {
-        console.error('IMPORT ERROR:', err);
+        log('FATAL ERROR: ' + err.message);
         process.exit(1);
     }
 }
 
-importData();
+seed();

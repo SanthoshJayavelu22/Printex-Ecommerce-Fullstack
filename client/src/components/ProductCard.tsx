@@ -17,9 +17,10 @@ interface ProductCardProps {
   image: string
   size?: string
   qty?: number
+  layout?: 'grid' | 'list'
 }
 
-export default function ProductCard({ id, slug, name, material, rating, price, image, size, qty }: ProductCardProps) {
+export default function ProductCard({ id, slug, name, material, rating, price, image, size, qty, layout = 'grid' }: ProductCardProps) {
   const { addToCart } = useCart()
   const { user } = useAuth()
   const router = useRouter()
@@ -45,6 +46,57 @@ export default function ProductCard({ id, slug, name, material, rating, price, i
     } finally {
       setLoading(false)
     }
+  }
+
+  if (layout === 'list') {
+    return (
+      <div 
+        className="group relative flex flex-col sm:flex-row bg-white transition-all duration-300 shadow-sm border border-slate-100 rounded-[2rem] p-4 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+        onClick={() => router.push(`/product/${slug}`)}
+      >
+        <div className="relative h-48 w-48 shrink-0 bg-slate-50 rounded-[1.5rem] overflow-hidden">
+          <Image
+            src={image}
+            alt={name}
+            fill
+            className="object-cover transition-transform duration-[1.5s] group-hover:scale-105"
+          />
+        </div>
+        
+        <div className="flex flex-col flex-1 justify-center px-4 sm:px-6 mt-4 sm:mt-0">
+          <div className="flex justify-between items-start mb-2">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">{material}</p>
+              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight leading-tight group-hover:text-primary transition-colors">
+                {name}
+              </h3>
+            </div>
+            <div className="text-right">
+              <p className="text-xl font-black text-slate-900 italic">₹{price}</p>
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Starting At</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-2 mb-6">
+            <span className="px-3 py-1 bg-slate-50 rounded-full text-[9px] font-black uppercase tracking-widest text-slate-500">Size: {size || '2x2"'}</span>
+            <span className="px-3 py-1 bg-slate-50 rounded-full text-[9px] font-black uppercase tracking-widest text-slate-500">Qty: {qty || 100}</span>
+          </div>
+
+          <div className="flex gap-3 mt-auto">
+            <button 
+              disabled={loading}
+              onClick={handleAddToCart}
+              className="flex-1 bg-primary text-white py-3 rounded-full text-[9px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-secondary transition-all shadow-lg shadow-primary/10 disabled:opacity-50"
+            >
+              {loading ? <Loader2 size={14} className="animate-spin" /> : <ShoppingBag size={14} />} Add to Cart
+            </button>
+            <button className="h-10 px-4 border border-slate-100 text-[9px] font-black uppercase tracking-widest text-slate-400 rounded-full hover:bg-slate-50 transition-colors">
+              Details
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -113,3 +165,4 @@ export default function ProductCard({ id, slug, name, material, rating, price, i
     </div>
   )
 }
+

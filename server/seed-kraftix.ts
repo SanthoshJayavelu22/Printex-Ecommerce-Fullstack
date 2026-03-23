@@ -1,11 +1,13 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const slugify = require('slugify');
-
-// Compiled models (assuming they are in dist)
-let Category, Product;
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import Category from './src/models/Category';
+import Product from './src/models/Product';
+import slugify from 'slugify';
 
 dotenv.config({ path: './.env' });
+
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/kraftix';
+mongoose.connect(MONGO_URI);
 
 const data = [
   {
@@ -111,38 +113,18 @@ const data = [
   }
 ];
 
-const makeSlug = (str) => slugify(str, { lower: true, strict: true, remove: /[*+~.()'"!:@&]/g });
+const makeSlug = (str: string) => slugify(str, { lower: true, strict: true, remove: /[*+~.()'"!:@&]/g });
 
-async function importData() {
+const importData = async () => {
     try {
-        console.log('Connecting to:', process.env.MONGO_URI);
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('Connected to MongoDB.');
-
-        // Load models
-        try {
-            const CatRes = require('./dist/models/Category');
-            Category = CatRes.default || CatRes;
-            const ProdRes = require('./dist/models/Product');
-            Product = ProdRes.default || ProdRes;
-        } catch (err) {
-            console.error('FAILED TO LOAD COMPILED MODELS. TRYING SCHEMA DEFINITION...');
-            // Fallback: Define simplest schemas if dist is broken
-            Category = mongoose.models.Category || mongoose.model('Category', new mongoose.Schema({
-                name: String, slug: String, parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' }, order: Number, isActive: { type: Boolean, default: true }
-            }));
-            Product = mongoose.models.Product || mongoose.model('Product', new mongoose.Schema({
-                name: String, slug: String, description: String, price: Number, categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }], stock: Number, images: [String], isActive: { type: Boolean, default: true }
-            }));
-        }
-
+        console.log('Connecting to database...');
         await Category.deleteMany();
         await Product.deleteMany();
         console.log('Database cleared.');
 
         let orderL1 = 1;
         for (const l1 of data) {
-            console.log(`Working on ${l1.name}...`);
+            console.log(`Creating parent category: ${l1.name}`);
             const parentCat = await Category.create({
                 name: l1.name,
                 slug: makeSlug(l1.name),
@@ -151,6 +133,7 @@ async function importData() {
 
             let orderL2 = 1;
             for (const l2 of l1.subcategories) {
+                console.log(`  Creating subcategory: ${l2.name}`);
                 const subCat = await Category.create({
                     name: l2.name,
                     slug: makeSlug(l1.name + ' ' + l2.name),
@@ -160,6 +143,8 @@ async function importData() {
                 
                 for (let i = 0; i < l2.items.length; i++) {
                     const productName = l2.items[i];
+                    console.log(`    Adding product: ${productName}`);
+                    
                     await Product.create({
                         name: productName,
                         slug: makeSlug(l1.name + ' ' + l2.name + ' ' + productName),
@@ -168,16 +153,23 @@ async function importData() {
                         categories: [subCat._id, parentCat._id],
                         stock: 500,
                         images: [`https://via.placeholder.com/800x600?text=${encodeURIComponent(productName)}`],
-                        isActive: true
+                        isActive: true,
+                        isDeleted: false,
+                        minOrderQuantity: 1,
+                        quantityDiscounts: [
+                            { minQuantity: 100, discountPercentage: 10 },
+                            { minQuantity: 500, discountPercentage: 20 },
+                            { minQuantity: 1000, discountPercentage: 35 }
+                        ]
                     });
                 }
             }
         }
         
         console.log('Kraftix Data Imported successfully');
-        process.exit(0);
+        process.exit();
     } catch (err) {
-        console.error('IMPORT ERROR:', err);
+        console.error(err);
         process.exit(1);
     }
 }

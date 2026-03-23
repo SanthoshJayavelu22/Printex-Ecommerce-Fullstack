@@ -34,6 +34,7 @@ const advancedResults = async <T = any>(
 
     // Initial Query object
     let queryObj = JSON.parse(queryStr);
+    console.log('ADVANCED RESULTS QUERY OBJ:', JSON.stringify(queryObj, null, 2));
 
     // Keyword search (if keyword exists)
     if (reqQuery.keyword) {

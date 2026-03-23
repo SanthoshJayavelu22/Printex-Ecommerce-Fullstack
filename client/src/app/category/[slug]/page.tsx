@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { fetchApi } from "@/lib/api";
 import Link from "next/link";
-import { ChevronRight, Filter, ShoppingBag, LayoutGrid, ArrowDownAZ, LayoutList } from "lucide-react";
+import { ChevronRight, Filter, ShoppingBag, LayoutGrid, ArrowDownAZ, LayoutList, Loader2 } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export default function CategoryPage() {
   const params = useParams();
@@ -38,12 +40,10 @@ export default function CategoryPage() {
   const loadCategoryContext = async () => {
     setLoading(true);
     try {
-      // Load tree to find breadcrumbs/subcategories easily, or write a custom endpoint
       const treeRes = await fetchApi("/categories/tree");
       const tree = treeRes.data || [];
       setCategoryTree(tree);
       
-      // We could use a specific category by slug endpoint, for now we will flatten the tree to find it
       const flattenCategories = (nodes: any[], path: any[] = []): any[] => {
         let result: any[] = [];
         for (const node of nodes) {
@@ -72,7 +72,6 @@ export default function CategoryPage() {
 
   const loadProducts = async (currentPage: number, currentSort: string) => {
     try {
-      // Ensure backend supports searching products by category slug (implemented in service)
       const res = await fetchApi(`/products/category/${slug}?page=${currentPage}&limit=12&sort=${currentSort}`);
       setProducts(res.data || []);
       setTotalPages(Math.ceil((res.total || 0) / 12));
@@ -85,214 +84,225 @@ export default function CategoryPage() {
 
   if (loading && !category) {
     return (
-      <div className="min-h-screen pt-32 pb-16 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin"></div>
-          <p className="text-slate-500 font-bold tracking-widest uppercase text-sm">Loading Category...</p>
+      <>
+        <Header />
+        <div className="min-h-screen pt-44 pb-16 flex items-center justify-center bg-slate-50">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-12 w-12 text-primary animate-spin" />
+            <p className="text-slate-400 font-black tracking-widest uppercase text-[10px]">Loading Collection...</p>
+          </div>
         </div>
-      </div>
+        <Footer />
+      </>
     );
   }
 
   if (!category && !loading) {
     return (
-      <div className="min-h-screen pt-32 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center justify-center text-center">
-        <h1 className="text-4xl font-extrabold text-slate-900 mb-4">Category Not Found</h1>
-        <p className="text-slate-500 mb-8 max-w-md">We couldn't find the category you were looking for. It might have been moved or deleted.</p>
-        <Link href="/" className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-all shadow-lg hover:shadow-indigo-500/25">
-          Return Home
-        </Link>
-      </div>
+      <>
+        <Header />
+        <div className="min-h-screen pt-44 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center justify-center text-center">
+          <div className="bg-white p-12 rounded-[3rem] shadow-2xl shadow-primary/5 border border-slate-100 max-w-lg w-full">
+            <h1 className="text-4xl font-black text-primary uppercase tracking-tighter mb-4">Collection Not Found</h1>
+            <p className="text-slate-500 mb-8 font-medium">We couldn't find the category you were looking for. It might have been moved or deleted.</p>
+            <Link href="/" className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-secondary transition-all shadow-xl shadow-primary/10">
+              Return Home
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-44 pb-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 mb-8 text-sm font-semibold text-slate-500 overflow-x-auto whitespace-nowrap pb-2">
-          <Link href="/" className="hover:text-indigo-600 transition-colors">Home</Link>
-          <ChevronRight size={14} className="text-slate-300" />
-          <Link href="/shop" className="hover:text-indigo-600 transition-colors">Shop</Link>
-          {category?.breadcrumbs?.slice(0, -1).map((crumb: any, idx: number) => (
-            <span key={idx} className="flex items-center gap-2">
-              <ChevronRight size={14} className="text-slate-300" />
-              <Link href={`/category/${crumb.slug}`} className="hover:text-indigo-600 transition-colors">{crumb.name}</Link>
-            </span>
-          ))}
-          <ChevronRight size={14} className="text-slate-300" />
-          <span className="text-slate-900">{category?.name}</span>
-        </nav>
-
-        {/* Category Header */}
-        <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-slate-100 mb-10 flex flex-col sm:flex-row items-center justify-between gap-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/3"></div>
+    <div className="min-h-screen bg-slate-50">
+      <Header />
+      
+      <main className="pt-44 pb-20">
+        <div className="max-w-[1600px] mx-auto px-6 md:px-12 xl:px-24">
           
-          <div className="relative z-10 max-w-2xl">
-            <h1 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight mb-4">{category?.name}</h1>
-            <p className="text-lg text-slate-500 font-medium leading-relaxed">
-              {category?.description || "Explore our premium selection of products in this category. Crafted with excellence."}
-            </p>
-          </div>
-          
-          {category?.image && (
-            <div className="relative z-10 shrink-0">
-              <div className="h-32 w-32 sm:h-48 sm:w-48 bg-slate-100 rounded-full overflow-hidden shadow-xl ring-4 ring-white border border-slate-100">
-                <img src={category.image} alt={category.name} className="h-full w-full object-cover" />
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Subcategories Pills */}
-        {subcategories.length > 0 && (
-          <div className="mb-10 flex flex-wrap gap-3">
-            {subcategories.map(sub => (
-              <Link 
-                key={sub._id} 
-                href={`/category/${sub.slug}`}
-                className="inline-flex items-center px-4 py-2 bg-white border border-slate-200 rounded-full text-sm font-bold text-slate-700 shadow-sm hover:border-indigo-600 hover:text-indigo-600 hover:shadow-md transition-all"
-              >
-                {sub.name}
-              </Link>
+          {/* Breadcrumbs - Clean & Modern */}
+          <nav className="flex items-center gap-3 mb-12 text-[10px] font-black uppercase tracking-widest text-slate-400 overflow-x-auto whitespace-nowrap pb-2 no-scrollbar">
+            <Link href="/" className="hover:text-primary transition-colors flex items-center gap-2 active:scale-95">Home</Link>
+            {category?.breadcrumbs?.slice(0, -1).map((crumb: any, idx: number) => (
+              <span key={idx} className="flex items-center gap-3">
+                <ChevronRight size={12} className="text-slate-300" />
+                <Link href={`/category/${crumb.slug}`} className="hover:text-primary transition-colors active:scale-95">{crumb.name}</Link>
+              </span>
             ))}
-          </div>
-        )}
+            <ChevronRight size={12} className="text-slate-300" />
+            <span className="text-primary">{category?.name}</span>
+          </nav>
 
-        {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-          <p className="text-slate-500 font-medium">Showing <span className="font-bold text-slate-900">{products.length}</span> products</p>
-          
-          <div className="flex items-center gap-4 w-full sm:w-auto">
-            {/* Sort */}
-            <div className="relative flex-1 sm:flex-none">
-              <select 
-                value={sort}
-                onChange={(e) => setSort(e.target.value)}
-                className="appearance-none w-full sm:w-48 bg-white border border-slate-200 text-slate-700 py-2.5 pl-4 pr-10 rounded-xl font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-all cursor-pointer"
-              >
-                <option value="-createdAt">Newest First</option>
-                <option value="price">Price: Low to High</option>
-                <option value="-price">Price: High to Low</option>
-                <option value="name">Name: A to Z</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
-                <ArrowDownAZ size={16} />
-              </div>
+          {/* Category Header - High Impact */}
+          <div className="bg-primary rounded-[3rem] p-10 md:p-16 shadow-2xl shadow-primary/20 mb-12 flex flex-col md:flex-row items-center justify-between gap-10 relative overflow-hidden group">
+            {/* Abstract Background Decoration */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 transition-transform duration-[3000ms] group-hover:scale-110"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2"></div>
+            
+            <div className="relative z-10 flex-1 text-center md:text-left">
+              <span className="inline-block px-4 py-1.5 bg-secondary text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full mb-6 shadow-lg shadow-secondary/20">
+                Category
+              </span>
+              <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter uppercase leading-[0.9] mb-8">
+                {category?.name}
+              </h1>
+              <p className="text-white/60 font-bold max-w-xl leading-relaxed text-sm md:text-base">
+                {category?.description || "Explore our premium selection of solutions. Crafted with absolute precision for high-impact results."}
+              </p>
             </div>
             
-            {/* View Toggle */}
-            <div className="flex bg-white border border-slate-200 rounded-xl shadow-sm p-1 shrink-0">
-              <button 
-                onClick={() => setLayout('grid')} 
-                className={`p-1.5 rounded-lg transition-colors ${layout === 'grid' ? 'bg-slate-100 text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
-              >
-                <LayoutGrid size={18} />
-              </button>
-              <button 
-                onClick={() => setLayout('list')} 
-                className={`p-1.5 rounded-lg transition-colors ${layout === 'list' ? 'bg-slate-100 text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
-              >
-                <LayoutList size={18} />
-              </button>
+            {category?.image && (
+              <div className="relative z-10 shrink-0">
+                <div className="h-48 w-48 md:h-64 md:w-64 bg-white/5 rounded-[2.5rem] p-4 backdrop-blur-xl border border-white/10 shadow-3xl">
+                  <img 
+                    src={category.image} 
+                    alt={category.name} 
+                    className="h-full w-full object-cover rounded-2xl shadow-2xl group-hover:scale-105 transition-transform duration-700" 
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-12">
+            {/* Sidebar / Filters */}
+            <aside className="lg:w-72 shrink-0">
+              <div className="sticky top-52 space-y-10">
+                {/* Subcategories */}
+                {subcategories.length > 0 && (
+                  <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6">Sub Collections</h3>
+                    <div className="flex flex-col gap-3">
+                      {subcategories.map(sub => (
+                        <Link 
+                          key={sub._id} 
+                          href={`/category/${sub.slug}`}
+                          className="flex items-center justify-between group p-3 rounded-2xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100"
+                        >
+                          <span className="text-xs font-black uppercase tracking-widest text-primary group-hover:text-secondary transition-colors">
+                            {sub.name}
+                          </span>
+                          <ChevronRight size={14} className="text-slate-300 group-hover:text-secondary group-hover:translate-x-1 transition-all" />
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Sorting */}
+                <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6">Display Settings</h3>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1 block mb-3">Sort Results</label>
+                      <select 
+                        value={sort}
+                        onChange={(e) => setSort(e.target.value)}
+                        className="w-full bg-slate-50 border border-slate-100 text-primary py-3 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all cursor-pointer appearance-none"
+                      >
+                        <option value="-createdAt">New Arrivals</option>
+                        <option value="price">Price: Low to High</option>
+                        <option value="-price">Price: High to Low</option>
+                        <option value="name">Product Name: A-Z</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1 block mb-3">View Mode</label>
+                      <div className="flex bg-slate-50 border border-slate-100 rounded-xl p-1 shrink-0">
+                        <button 
+                          onClick={() => setLayout('grid')} 
+                          className={`flex-1 flex items-center justify-center py-2 rounded-lg transition-all ${layout === 'grid' ? 'bg-white text-primary shadow-sm scale-105' : 'text-slate-400'}`}
+                        >
+                          <LayoutGrid size={16} />
+                        </button>
+                        <button 
+                          onClick={() => setLayout('list')} 
+                          className={`flex-1 flex items-center justify-center py-2 rounded-lg transition-all ${layout === 'list' ? 'bg-white text-primary shadow-sm scale-105' : 'text-slate-400'}`}
+                        >
+                          <LayoutList size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </aside>
+
+            {/* Main Content Area */}
+            <div className="flex-1">
+              {/* Products Section */}
+              <div className="mb-8 flex items-center justify-between">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                  Displaying <span className="text-primary">{products.length}</span> Solutions
+                </p>
+              </div>
+
+              {loading && products.length === 0 ? (
+                <div className={`grid gap-8 ${layout === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
+                  {[1,2,3,4,5,6].map(i => (
+                    <div key={i} className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm animate-pulse">
+                      <div className="aspect-square bg-slate-50 rounded-[2rem] mb-6"></div>
+                      <div className="h-4 bg-slate-50 rounded-full w-3/4 mb-4"></div>
+                      <div className="h-4 bg-slate-50 rounded-full w-1/2"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : products.length > 0 ? (
+                <div className={`grid gap-8 ${layout === 'grid' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`}>
+                  {products.map((product) => (
+                    <ProductCard
+                      key={product._id}
+                      id={product._id}
+                      slug={product.slug}
+                      name={product.name}
+                      material={product.defaultMaterial || (product.categories?.[0]?.name) || "Premium"}
+                      rating={5}
+                      price={product.price}
+                      image={product.images?.[0] || '/placeholder.png'}
+                      size={product.defaultSize}
+                      qty={product.defaultQuantity}
+                      layout={layout}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-white rounded-[3rem] p-20 text-center border border-slate-100 shadow-sm shadow-primary/5">
+                  <div className="h-24 w-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8">
+                    <ShoppingBag className="h-10 w-10 text-slate-200" />
+                  </div>
+                  <h3 className="text-3xl font-black text-primary uppercase tracking-tighter mb-4">No products found</h3>
+                  <p className="text-slate-500 font-medium max-w-md mx-auto mb-8 text-sm">We couldn't find any products in this collection. Try adjusting your sorting or explore other categories.</p>
+                  <Link href="/" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-secondary hover:translate-x-1 transition-all">
+                    Back to Catalog <ChevronRight size={14} />
+                  </Link>
+                </div>
+              )}
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-16 flex justify-center">
+                  <div className="flex gap-3 bg-white rounded-[2rem] shadow-xl shadow-primary/5 border border-slate-100 p-2">
+                    {[...Array(totalPages)].map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => { setPage(i + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        className={`h-12 w-12 rounded-2xl font-black text-xs transition-all ${page === i + 1 ? 'bg-primary text-white shadow-xl shadow-primary/20 scale-110' : 'text-slate-400 hover:bg-slate-50'} `}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
+      </main>
 
-        {/* Products Grid */}
-        {loading && products.length === 0 ? (
-          <div className={`grid gap-6 ${layout === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1'}`}>
-            {[1,2,3,4,5,6,7,8].map(i => (
-              <div key={i} className={`bg-white rounded-2xl shadow-sm border border-slate-100 p-4 animate-pulse ${layout === 'list' ? 'flex gap-6 items-center' : ''}`}>
-                <div className={`bg-slate-200 rounded-xl ${layout === 'grid' ? 'aspect-square w-full mb-4' : 'h-32 w-32 shrink-0'}`}></div>
-                <div className={`${layout === 'list' ? 'flex-1' : ''}`}>
-                  <div className="h-4 bg-slate-200 rounded w-3/4 mb-3"></div>
-                  <div className="h-3 bg-slate-200 rounded w-1/2 mb-4"></div>
-                  <div className="h-6 bg-slate-200 rounded w-1/4"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : products.length > 0 ? (
-          <div className={`grid gap-6 ${layout === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1'}`}>
-            {products.map((product) => (
-              layout === 'grid' ? (
-                <ProductCard
-                  key={product._id}
-                  id={product._id}
-                  slug={product.slug}
-                  name={product.name}
-                  material={product.defaultMaterial || (product.categories?.[0]?.name) || "Premium"}
-                  rating={5}
-                  price={product.price}
-                  image={product.images?.[0] || '/placeholder.png'}
-                  size={product.defaultSize}
-                  qty={product.defaultQuantity}
-                />
-              ) : (
-                <div 
-                  key={product._id} 
-                  onClick={() => window.location.href = `/product/${product.slug}`}
-                  className="group bg-white rounded-3xl p-4 transition-all duration-300 shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 flex flex-col sm:flex-row gap-6 items-center cursor-pointer"
-                >
-                  <div className="relative h-48 w-48 shrink-0 bg-slate-50 rounded-2xl overflow-hidden">
-                    {product.images && product.images[0] ? (
-                      <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover mix-blend-multiply transition-transform duration-700 group-hover:scale-105" />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center text-slate-300">
-                        <ShoppingBag size={48} />
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex flex-col flex-1 justify-center">
-                    <div className="flex gap-2 flex-wrap mb-2">
-                      {product.categories?.slice(0,2).map((cat: any) => (
-                        <span key={cat._id} className="text-[10px] uppercase tracking-wider font-extrabold text-indigo-500">
-                          {cat.name}
-                        </span>
-                      ))}
-                    </div>
-                    <h3 className="text-lg font-black text-slate-900 leading-tight mb-2 group-hover:text-indigo-600 transition-colors">
-                      {product.name}
-                    </h3>
-                    <p className="text-slate-500 text-sm font-medium mb-4 line-clamp-2 max-w-2xl">{product.description}</p>
-                    <div className="flex items-center justify-between mt-auto pt-2">
-                      <span className="text-xl font-black text-slate-900">₹{product.price?.toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-              )
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white rounded-3xl p-16 text-center border border-slate-100 shadow-sm">
-            <div className="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <ShoppingBag className="h-10 w-10 text-slate-300" />
-            </div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-2">No products found</h3>
-            <p className="text-slate-500 max-w-md mx-auto">We couldn't find any products in this category at the moment. Please check back later or explore other categories.</p>
-          </div>
-        )}
-
-        {/* Pagination Loop */}
-        {totalPages > 1 && (
-          <div className="mt-12 flex justify-center">
-            <div className="flex gap-2 bg-white rounded-xl shadow-sm border border-slate-100 p-1">
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setPage(i + 1)}
-                  className={`h-10 w-10 rounded-lg font-bold text-sm transition-all ${page === i + 1 ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-50'} `}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      <Footer />
     </div>
   );
 }

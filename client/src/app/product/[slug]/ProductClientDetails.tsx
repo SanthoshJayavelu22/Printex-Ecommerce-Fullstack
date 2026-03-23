@@ -203,34 +203,35 @@ export default function ProductClientDetails({ product }: { product: any }) {
   }, { scope: containerRef });
 
   return (
-    <div ref={containerRef} className="pt-36 pb-20 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div ref={containerRef} className="pt-44 pb-20 max-w-[1600px] mx-auto px-6 md:px-12 xl:px-24">
       
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 mb-4 text-xs font-semibold text-slate-500 overflow-x-auto whitespace-nowrap pb-1 lowercase tracking-wider">
-        <Link href="/" className="hover:text-black transition-colors">Home</Link>
-        <ChevronRight size={10} className="text-slate-300" />
+      {/* Breadcrumbs - Matching Category Page */}
+      <nav aria-label="Breadcrumb" className="flex items-center gap-3 mb-10 text-[10px] font-black uppercase tracking-widest text-slate-400 overflow-x-auto whitespace-nowrap pb-2 no-scrollbar">
+        <Link href="/" className="hover:text-primary transition-colors flex items-center gap-2 active:scale-95">Home</Link>
         {product.categories?.[0] ? (
           <>
-            <Link href={`/category/${product.categories[0].slug}`} className="hover:text-black transition-colors">
+            <ChevronRight size={12} className="text-slate-300" />
+            <Link href={`/category/${product.categories[0].slug}`} className="hover:text-primary transition-colors active:scale-95">
               {product.categories[0].name}
             </Link>
-            <ChevronRight size={10} className="text-slate-300" />
           </>
         ) : null}
-        <span className="text-black truncate max-w-[200px]">{product.name}</span>
+        <ChevronRight size={12} className="text-slate-300" />
+        <span className="text-primary truncate max-w-[200px]">{product.name}</span>
       </nav>
 
-      <div className="flex flex-col lg:flex-row gap-12 relative">
+      <div className="flex flex-col lg:flex-row gap-16 relative">
         {/* Left Side: Images & Info Details */}
         <div className="w-full lg:w-3/5 xl:w-[65%]">
-            <div className="flex justify-between items-start gap-4 mb-2">
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+            <div className="flex justify-between items-start gap-6 mb-4">
+                <h1 className="text-4xl md:text-6xl font-black text-primary tracking-tighter uppercase leading-[0.9]">
                     {product.name}
                 </h1>
                 <button 
                     onClick={handleToggleWishlist}
-                    className={`shrink-0 w-12 h-12 rounded-full border flex items-center justify-center transition-all ${isInWishlist ? 'bg-pink-50 border-pink-200 text-pink-500' : 'bg-white border-slate-200 text-slate-400 hover:text-pink-500'}`}
+                    className={`shrink-0 w-14 h-14 rounded-full border flex items-center justify-center transition-all shadow-sm ${isInWishlist ? 'bg-pink-50 border-pink-200 text-pink-500' : 'bg-white border-slate-100 text-slate-300 hover:text-secondary hover:border-secondary'}`}
                 >
-                    <Heart size={20} fill={isInWishlist ? "currentColor" : "none"} />
+                    <Heart size={24} fill={isInWishlist ? "currentColor" : "none"} />
                 </button>
             </div>
             
@@ -286,27 +287,27 @@ export default function ProductClientDetails({ product }: { product: any }) {
             </div>
 
             {/* 3 Step Process Icons */}
-            <div className="ux-anim-section border border-slate-100 rounded-3xl p-10 flex flex-col md:flex-row justify-center items-center gap-12 text-center bg-[#FAFAFA] mb-16 shadow-premium">
+            <div className="ux-anim-section border border-slate-100 rounded-[3rem] p-10 flex flex-col md:flex-row justify-center items-center gap-16 text-center bg-white mb-16 shadow-premium">
                 <div className="flex flex-col items-center max-w-[200px] group">
-                    <div className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center mb-6 shadow-sm group-hover:bg-black group-hover:text-white transition-all duration-500">
-                        <ClipboardList size={28} />
+                    <div className="w-20 h-20 bg-slate-50 text-primary rounded-full flex items-center justify-center mb-6 shadow-sm group-hover:bg-primary group-hover:text-white transition-all duration-700">
+                        <ClipboardList size={32} />
                     </div>
-                    <h3 className="font-black text-black mb-2 text-sm uppercase tracking-tight">Order Product</h3>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Select size, quantity & material</p>
+                    <h3 className="font-black text-primary mb-3 text-[10px] uppercase tracking-[0.2em]">Order Product</h3>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">Select size, quantity & material</p>
                 </div>
                 <div className="flex flex-col items-center max-w-[200px] group">
-                    <div className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center mb-6 shadow-sm group-hover:bg-black group-hover:text-white transition-all duration-500">
-                        <PenTool size={28} />
+                    <div className="w-20 h-20 bg-slate-50 text-primary rounded-full flex items-center justify-center mb-6 shadow-sm group-hover:bg-primary group-hover:text-white transition-all duration-700">
+                        <PenTool size={32} />
                     </div>
-                    <h3 className="font-black text-black mb-2 text-sm uppercase tracking-tight">Design Approval</h3>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Approve print via whatsapp / email</p>
+                    <h3 className="font-black text-primary mb-3 text-[10px] uppercase tracking-[0.2em]">Design Approval</h3>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">Approve print via whatsapp / email</p>
                 </div>
                 <div className="flex flex-col items-center max-w-[200px] group">
-                    <div className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center mb-6 shadow-sm group-hover:bg-black group-hover:text-white transition-all duration-500">
-                        <CalendarSearch size={28} />
+                    <div className="w-20 h-20 bg-slate-50 text-primary rounded-full flex items-center justify-center mb-6 shadow-sm group-hover:bg-primary group-hover:text-white transition-all duration-700">
+                        <CalendarSearch size={32} />
                     </div>
-                    <h3 className="font-black text-black mb-2 text-sm uppercase tracking-tight">Dispatch</h3>
-                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Fast shipping in 2-3 business days</p>
+                    <h3 className="font-black text-primary mb-3 text-[10px] uppercase tracking-[0.2em]">Dispatch</h3>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">Fast shipping in 2-3 business days</p>
                 </div>
             </div>
 
@@ -315,29 +316,29 @@ export default function ProductClientDetails({ product }: { product: any }) {
              <div className="ux-anim-section border-b border-slate-100 mb-4 bg-white overflow-hidden">
                  <button 
                    onClick={() => setShowHowTo(!showHowTo)} 
-                   className="w-full flex items-center justify-between py-8 text-left transition-colors"
+                   className="w-full flex items-center justify-between py-10 text-left transition-colors"
                  >
-                     <h2 className="text-4xl font-black text-black uppercase tracking-tighter">How to Order</h2>
-                     {showHowTo ? <ChevronUp size={24} className="text-black"/> : <ChevronDown size={24} className="text-gray-300"/>}
+                     <h2 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter">How to Order</h2>
+                     {showHowTo ? <ChevronUp size={24} className="text-primary"/> : <ChevronDown size={24} className="text-slate-300"/>}
                  </button>
                  {showHowTo && (
-                     <div className="pb-12 text-gray-500 text-lg leading-relaxed space-y-8 font-medium">
+                     <div className="pb-12 text-slate-500 text-base leading-relaxed space-y-10 font-medium">
                          <div className="max-w-3xl">
-                             <h3 className="font-black text-black text-2xl uppercase tracking-tight mb-4">{product.name} | Professional Look on Every Shipment!</h3>
+                             <h3 className="font-black text-primary text-2xl uppercase tracking-tighter mb-6 underline decoration-secondary decoration-4 underline-offset-8">{product.name} | Professional High-Impact Finish</h3>
                              <p>
-                                Handwriting addresses is time-consuming and can make business mail look unprofessional. Custom printed address labels from Kraftix Digital save you significant time while ensuring every envelope, package, and mailer you send has a crisp, professional finish that represents your brand or event perfectly.
+                                Custom printed address labels from Printix Labels save you significant time while ensuring every envelope, package, and mailer you send has a crisp, professional finish that represents your brand or event perfectly.
                              </p>
                          </div>
                          <ul className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                             <li className="space-y-3 p-8 rounded-[2rem] bg-gray-50 border border-gray-100">
-                                <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center font-black text-xs">01</div>
-                                <p className="text-black font-black uppercase tracking-tight">Streamline Process</p>
-                                <p className="text-sm">Say goodbye to the tedious task of handwriting. A stack of pre-printed tags slash down your shipping and mailing process.</p>
+                             <li className="space-y-4 p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100">
+                                <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-black text-xs shadow-xl shadow-primary/20">01</div>
+                                <p className="text-primary font-black uppercase tracking-widest text-[10px]">Streamline Process</p>
+                                <p className="text-sm font-bold text-slate-400">Say goodbye to the tedious task of handwriting. A stack of pre-printed tags slashes your shipping and mailing process time.</p>
                              </li>
-                             <li className="space-y-3 p-8 rounded-[2rem] bg-gray-50 border border-gray-100">
-                                <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center font-black text-xs">02</div>
-                                <p className="text-black font-black uppercase tracking-tight">Professional Appearance</p>
-                                <p className="text-sm">We print your name, logo, and address with sharp clarity on high quality materials, ensuring your brand looks its best.</p>
+                             <li className="space-y-4 p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100">
+                                <div className="w-12 h-12 rounded-2xl bg-secondary text-white flex items-center justify-center font-black text-xs shadow-xl shadow-secondary/20">02</div>
+                                <p className="text-primary font-black uppercase tracking-widest text-[10px]">Professional Appearance</p>
+                                <p className="text-sm font-bold text-slate-400">We print your name, logo, and address with sharp clarity on high quality materials, ensuring your brand looks its best.</p>
                              </li>
                          </ul>
                      </div>
@@ -348,10 +349,10 @@ export default function ProductClientDetails({ product }: { product: any }) {
              <div className="ux-anim-section border-b border-slate-100 mb-12 bg-white overflow-hidden">
                  <button 
                    onClick={() => setShowFaq(!showFaq)} 
-                   className="w-full flex items-center justify-between py-8 text-left transition-colors"
+                   className="w-full flex items-center justify-between py-10 text-left transition-colors"
                  >
-                     <h2 className="text-4xl font-black text-black uppercase tracking-tighter">FAQs</h2>
-                     {showFaq ? <ChevronUp size={24} className="text-black"/> : <Plus size={24} className="text-gray-300"/>}
+                     <h2 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter">FAQs</h2>
+                     {showFaq ? <ChevronUp size={24} className="text-primary"/> : <Plus size={24} className="text-slate-300"/>}
                  </button>
                  {showFaq && (
                      <div className="pb-12 text-gray-500 text-lg leading-relaxed flex flex-col gap-8">

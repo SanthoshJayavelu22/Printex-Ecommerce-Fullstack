@@ -97,7 +97,7 @@ const userSchema: Schema<IUser> = new Schema({
 });
 
 // Hash password before saving
-userSchema.pre<IUser>('save', async function(next) { // Added 'next' parameter for explicit middleware signature
+userSchema.pre<IUser>('save', async function() {
     if (!this.isModified('password')) {
         return;
     }

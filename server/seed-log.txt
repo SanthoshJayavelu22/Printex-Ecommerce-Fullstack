@@ -1,0 +1,30 @@
+SEEDING CALLED
+Connecting to: mongodb://localhost:27017/tridev_ecommerce?retryWrites=true&w=majority
+Connected to MongoDB.
+Clearing existing data...
+Database cleared.
+Seeding parent: Sticker/Labels
+  Seeding sub: Stickers by Shape
+  Seeding sub: Stickers by Material
+  Seeding sub: Stickers by Use
+  Seeding sub: Exclusive Stickers
+  Seeding sub: Transfer Stickers
+Seeding parent: Packaging
+  Seeding sub: Paper Bags & Pouch
+  Seeding sub: Boxes
+  Seeding sub: Custom Courier Bags
+  Seeding sub: Tapes
+  Seeding sub: Thank You Cards
+Seeding parent: Cards/Stationery
+  Seeding sub: Business Cards
+  Seeding sub: Letterheads
+  Seeding sub: Envelopes
+Seeding parent: Marketing
+  Seeding sub: Posters
+  Seeding sub: Signs & Display
+  Seeding sub: Brochures
+Seeding parent: Industry
+  Seeding sub: Restaurant, Bakery, Kitchen & Cafe
+  Seeding sub: Packed Food & Beverage
+  Seeding sub: Health & Beauty
+SEEDING COMPLETE!
