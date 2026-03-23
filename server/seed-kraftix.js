@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const Category = require('./models/Category');
-const Product = require('./models/Product');
+const Category = require('./dist/models/Category').default;
+const Product = require('./dist/models/Product').default;
 const slugify = require('slugify');
 
 dotenv.config({ path: './.env' });
