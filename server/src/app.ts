@@ -30,19 +30,26 @@ const allowedOrigins = [
   "http://127.0.0.1:3000",
   "http://127.0.0.1:5500",
   "https://printixlabels.com",
+  "http://printixlabels.com",
   "https://www.printixlabels.com",
+  "http://www.printixlabels.com",
 ];
 
 const corsOptions: cors.CorsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('printixlabels.com')) {
       callback(null, true);
     } else {
-      console.warn(`Origin rejected by CORS: ${origin}`);
-      callback(new Error("Not allowed by CORS"));
+      console.error(`CORS rejected for origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 app.use(cors(corsOptions));
 
