@@ -224,7 +224,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
         {/* Left Side: Images & Info Details */}
         <div className="w-full lg:w-3/5 xl:w-[65%]">
             <div className="flex justify-between items-start gap-6 mb-4">
-                <h1 className="text-4xl md:text-6xl font-black text-primary tracking-tighter uppercase leading-[0.9]">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-primary tracking-tighter uppercase leading-[0.9]">
                     {product.name}
                 </h1>
                 <button 
@@ -318,7 +318,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
                    onClick={() => setShowHowTo(!showHowTo)} 
                    className="w-full flex items-center justify-between py-10 text-left transition-colors"
                  >
-                     <h2 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter">How to Order</h2>
+                     <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter">How to Order</h2>
                      {showHowTo ? <ChevronUp size={24} className="text-primary"/> : <ChevronDown size={24} className="text-slate-300"/>}
                  </button>
                  {showHowTo && (
@@ -351,7 +351,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
                    onClick={() => setShowFaq(!showFaq)} 
                    className="w-full flex items-center justify-between py-10 text-left transition-colors"
                  >
-                     <h2 className="text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter">FAQs</h2>
+                     <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-primary uppercase tracking-tighter">FAQs</h2>
                      {showFaq ? <ChevronUp size={24} className="text-primary"/> : <Plus size={24} className="text-slate-300"/>}
                  </button>
                  {showFaq && (
@@ -371,7 +371,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
              {/* Customer Reviews Section */}
              <div className="ux-anim-section mb-24">
                  <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
-                      <h2 className="text-5xl md:text-7xl font-black text-black uppercase tracking-tighter leading-[0.85]">Customer <br/><span className="text-gray-200">Reviews.</span></h2>
+                      <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-black uppercase tracking-tighter leading-[0.85]">Customer <br/><span className="text-gray-200">Reviews.</span></h2>
                       <div className="flex gap-3">
                           <button 
                             onClick={() => {
@@ -468,7 +468,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
 
              {/* Related Products Section */}
              <div className="ux-anim-section mb-24">
-                  <h2 className="text-5xl md:text-7xl font-black text-black uppercase tracking-tighter mb-12">Related <br/><span className="text-gray-200">Items.</span></h2>
+                  <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-black uppercase tracking-tighter mb-12">Related <br/><span className="text-gray-200">Items.</span></h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
                      {(product.relatedProducts && product.relatedProducts.length > 0 ? product.relatedProducts : [
                          {_id: '1', name: 'Vinyl Die-Cut Stickers', slug: 'vinyl-die-cut-stickers', images: ['https://images.unsplash.com/photo-1572375958540-bbfe49cf9330?auto=format&fit=crop&q=80']},

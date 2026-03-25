@@ -8,7 +8,8 @@ import {
     updateProfile, 
     addAddress, 
     removeAddress, 
-    toggleWishlist 
+    toggleWishlist,
+    verifyOTP
 } from '../controllers/authController';
 import { protect, authorize } from '../middleware/authMiddleware';
 import { validateRegister, validateLogin, validateResetPassword } from '../middleware/validations/authValidations';
@@ -17,6 +18,7 @@ import { ROLES } from '../constants/roles';
 const router = express.Router();
 
 router.post('/register', validateRegister, register);
+router.post('/verify-otp', verifyOTP);
 router.post('/login', validateLogin, login);
 router.post('/forgotpassword', forgotPassword);
 router.put('/resetpassword', validateResetPassword, resetPassword);

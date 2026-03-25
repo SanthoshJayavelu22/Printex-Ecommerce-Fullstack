@@ -25,6 +25,7 @@ export interface IUser extends Document {
     wishlist: mongoose.Types.ObjectId[];
     otp?: string | null;
     otpExpire?: Date | null;
+    isVerified: boolean;
     matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -91,6 +92,10 @@ const userSchema: Schema<IUser> = new Schema({
     otpExpire: {
         type: Date,
         default: null
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true

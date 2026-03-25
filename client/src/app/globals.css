@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "tailwindcss/index.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -45,7 +45,7 @@
 
   body {
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-    @apply bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300;
+    @apply bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300 overflow-x-hidden;
   }
 
   h1, h2, h3, h4, .font-display {

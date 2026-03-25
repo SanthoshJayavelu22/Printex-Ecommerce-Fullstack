@@ -2,6 +2,7 @@ import User, { IUser } from '../models/User';
 import jwt from 'jsonwebtoken';
 import ErrorResponse from '../utils/errorResponse';
 import emailService from './emailService';
+import whatsappService from './whatsappService';
 
 // Generate Token
 const generateToken = (id: string | any) => {
@@ -21,19 +22,75 @@ export const registerUser = async (userData: any) => {
     const { name, email, password, role, phoneNumber } = userData;
 
     // Check if user exists
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-        throw new ErrorResponse('User already exists', 400);
+    let user = await User.findOne({ email });
+    
+    if (user) {
+        if (user.isVerified) {
+            throw new ErrorResponse('User already exists', 400);
+        }
+        // If user exists but not verified, update details and resend OTP
+        user.name = name;
+        user.password = password;
+        user.phoneNumber = phoneNumber;
+    } else {
+        // Create unverified user
+        user = new User({
+            name,
+            email,
+            password,
+            phoneNumber,
+            role: role || 'user',
+            isVerified: false
+        });
     }
 
-    // Create user
-    const user = await User.create({
-        name,
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otp = otp;
+    user.otpExpire = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
+
+    await user.save();
+
+    try {
+        await Promise.all([
+            emailService.sendOTPEmail(user.email, otp),
+            whatsappService.sendOTP(user.phoneNumber as string, otp)
+        ]);
+        
+        return {
+            message: 'OTP sent to email and WhatsApp number'
+        };
+    } catch (err) {
+        user.otp = null;
+        user.otpExpire = null;
+        await user.save();
+        throw new ErrorResponse('Email could not be sent', 500);
+    }
+};
+
+/**
+ * Verify Registration OTP
+ */
+export const verifyRegisterOTP = async (email: string, otp: string) => {
+    const user = await User.findOne({
         email,
-        password,
-        phoneNumber,
-        role: role || 'user'
+        otp,
+        otpExpire: { $gt: new Date() }
     });
+
+    if (!user) {
+        throw new ErrorResponse('Invalid or expired OTP', 400);
+    }
+
+    user.isVerified = true;
+    user.otp = null;
+    user.otpExpire = null;
+
+    await user.save();
+
+    // Send welcome notifications (async)
+    emailService.sendWelcomeEmail(user).catch(err => console.error('Email error:', err));
+    whatsappService.sendWelcomeMessage(user).catch(err => console.error('WhatsApp welcome error:', err));
 
     const token = generateToken(user._id);
 
@@ -56,6 +113,10 @@ export const loginUser = async (email: string, password: string) => {
 
     if (!user || !(await (user as any).matchPassword(password))) {
         throw new ErrorResponse('Invalid credentials', 401);
+    }
+
+    if (!user.isVerified) {
+        throw new ErrorResponse('Please verify your email to login', 401);
     }
 
     const token = generateToken(user._id);
@@ -216,6 +277,7 @@ export const toggleWishlistService = async (userId: string, productId: string) =
 export default {
     registerUser,
     loginUser,
+    verifyRegisterOTP,
     forgotPasswordService,
     resetPasswordService,
     getUserProfile,

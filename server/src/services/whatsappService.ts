@@ -85,15 +85,123 @@ class WhatsappService {
      */
     async sendOrderConfirmation(user: any, order: any) {
         const phone = user.phoneNumber;
-        if (!phone) {
-            console.warn(`User ${user.name} does not have a phone number. Cannot send WhatsApp.`);
-            return;
-        }
+        if (!phone) return;
 
-        const message = `Hello ${user.name}! 🛍️\n\nYour order #${order._id.toString().slice(-8).toUpperCase()} has been placed successfully at Printix Labels.\n\nTotal Amount: ₹${order.totalAmount.toLocaleString()}\nStatus: ${order.paymentInfo.status}\n\nThank you for shopping with us! ✨`;
+        const message = 
+`*ORDER CONFIRMED* 🛍️
+
+Hello ${user.name},
+
+Your vision is now in production! We've received your order *#${order._id.toString().toUpperCase().slice(-8)}*.
+
+*Investment:* INR ${order.totalAmount.toLocaleString()}
+*Payment:* ${order.paymentInfo.method}
+
+Our team is now beginning the precision-printing process. You can track your craft here:
+https://printixlabels.com/orders/${order._id}
+
+Thank you for choosing *Printix Labels Studio*. ✨`;
 
         return this.sendMessage(phone, message).catch(err => {
             console.error('Failed to send WhatsApp confirmation:', err.message);
+        });
+    }
+
+    /**
+     * Send order status update WhatsApp message
+     * @param {any} user - User object
+     * @param {any} order - Order object
+     */
+    async sendOrderStatusUpdate(user: any, order: any) {
+        const phone = user.phoneNumber;
+        if (!phone) return;
+
+        let statusEmoji = '📦';
+        let progressText = 'is being processed';
+        
+        if (order.orderStatus === 'Shipped') {
+            statusEmoji = '🚚';
+            progressText = 'has been dispatched';
+        } else if (order.orderStatus === 'Delivered') {
+            statusEmoji = '🎉';
+            progressText = 'has been delivered';
+        } else if (order.orderStatus === 'Cancelled') {
+            statusEmoji = '❌';
+            progressText = 'has been cancelled';
+        }
+
+        let message = 
+`*MOVEMENT UPDATE* ${statusEmoji}
+
+Hello ${user.name},
+
+Your order *#${order._id.toString().toUpperCase().slice(-8)}* ${progressText}.
+
+*Current Phase:* ${order.orderStatus.toUpperCase()}`;
+
+        if (order.orderStatus === 'Shipped' && order.deliveryTracking?.trackingNumber) {
+            message += `\n\n*Partner:* ${order.deliveryTracking.courierName}\n*Tracking ID:* ${order.deliveryTracking.trackingNumber}`;
+            if (order.deliveryTracking.trackingUrl) {
+                message += `\n*Link:* ${order.deliveryTracking.trackingUrl}`;
+            }
+        }
+
+        message += `\n\nView Progress: https://printixlabels.com/orders/${order._id}\n\nThank you for trusting *Printix Labels*.`;
+
+        return this.sendMessage(phone, message).catch(err => {
+            console.error('Failed to send WhatsApp status update:', err.message);
+        });
+    }
+
+    /**
+     * Send welcome WhatsApp message
+     * @param {any} user - User object
+     */
+    async sendWelcomeMessage(user: any) {
+        const phone = user.phoneNumber;
+        if (!phone) return;
+
+        const message = 
+`*ESTABLISHED* 🎨✨
+
+Welcome to the collective, ${user.name}!
+
+You've joined *Printix Labels Studio*. We specialize in premium digital printing and high-end label solutions for the modern brand.
+
+*What's Next?*
+- Explore our Gallery
+- Choose your Materials
+- Elevate your Packaging
+
+Start Creating: https://printixlabels.com/product
+
+Best Regards,
+*Team Printix*`;
+
+        return this.sendMessage(phone, message).catch(err => {
+            console.error('Failed to send WhatsApp welcome message:', err.message);
+        });
+    }
+
+    /**
+     * Send OTP WhatsApp message
+     * @param {string} phone - Recipient mobile number
+     * @param {string} otp - OTP code
+     */
+    async sendOTP(phone: string, otp: string) {
+        if (!phone) return;
+
+        const message = 
+`*SECURITY ACCESS* 🔒
+
+Your exclusive verification code for *Printix Labels* is:
+
+*${otp}*
+
+This code will expire in 10 minutes. For your security, do not share this access key with anyone.`;
+
+        return this.sendMessage(phone, message).catch(err => {
+            console.error('Failed to send WhatsApp OTP:', err.message);
         });
     }
 }

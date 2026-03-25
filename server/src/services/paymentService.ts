@@ -72,17 +72,29 @@ export const verifyAndProcessPayment = async (paymentData: any) => {
     );
 
     if (!isVerified) {
-        throw new ErrorResponse('Payment verification failed', 400);
+        // Log the failure but don't just throw, maybe update the order with payment failure status
+        if (orderId) {
+            const order = await Order.findById(orderId);
+            if (order) {
+                order.paymentInfo.status = 'Failed';
+                order.orderStatus = 'Rejected';
+                await order.save();
+            }
+        }
+        throw new ErrorResponse('Payment verification failed. Please contact support.', 400);
     }
 
     const order = await Order.findById(orderId);
     if (!order) {
-        throw new ErrorResponse('Order not found', 404);
+        throw new ErrorResponse(`Order #${orderId} not found during payment verification`, 404);
     }
 
+    // Success path
     order.paymentInfo.status = 'Paid';
     order.paymentInfo.id = razorpay_payment_id;
-    order.orderStatus = 'Processing';
+    order.paymentInfo.razorpayPaymentId = razorpay_payment_id;
+    order.paymentInfo.razorpaySignature = razorpay_signature;
+    order.orderStatus = 'Confirmed'; // Marked as confirmed after payment
     await order.save();
 
     return order;

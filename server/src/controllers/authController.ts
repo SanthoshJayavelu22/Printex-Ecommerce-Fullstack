@@ -11,10 +11,25 @@ import { AuthRequest } from '../middleware/authMiddleware';
 export const register = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
     const result = await authService.registerUser(req.body);
     
-    // Send welcome email (async)
-    emailService.sendWelcomeEmail(result.user).catch(err => console.error('Email error:', err));
-
     res.status(201).json({
+        success: true,
+        ...result
+    });
+});
+
+// @desc    Verify OTP for registration
+// @route   POST /api/auth/verify-otp
+// @access  Public
+export const verifyOTP = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+        return next(new ErrorResponse('Please provide email and OTP', 400));
+    }
+
+    const result = await authService.verifyRegisterOTP(email, otp);
+
+    res.status(200).json({
         success: true,
         ...result
     });

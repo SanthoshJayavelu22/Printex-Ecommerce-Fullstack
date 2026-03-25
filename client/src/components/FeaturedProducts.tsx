@@ -63,7 +63,7 @@ export default function FeaturedProducts() {
       <div className="max-w-9xl mx-auto px-6 md:px-12 xl:px-24 relative z-10">
         <div className="featured-header flex flex-col md:flex-row justify-between items-end mb-24 gap-12 px-6">
           <div className="max-w-3xl">
-            <h2 className="text-5xl md:text-7xl lg:text-[6rem] font-black text-black uppercase tracking-tighter mb-6 leading-[0.85] text-balance">
+            <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-[6rem] font-black text-black uppercase tracking-tighter mb-6 leading-[0.85] text-balance">
               TRENDING <br /> <span className="text-gray-300">PRODUCTS.</span>
             </h2>
             <p className="text-xl text-gray-500 font-medium leading-relaxed max-w-xl">

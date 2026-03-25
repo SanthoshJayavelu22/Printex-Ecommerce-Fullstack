@@ -25,9 +25,12 @@ export interface IShippingAddress {
 }
 
 export interface IPaymentInfo {
-    id?: string;
+    id?: string; // Standard transaction ID
     status: string;
     method: string;
+    razorpayOrderId?: string;
+    razorpayPaymentId?: string;
+    razorpaySignature?: string;
 }
 
 export interface ICouponInfo {
@@ -92,7 +95,10 @@ const orderSchema: Schema<IOrder> = new Schema({
     paymentInfo: {
         id: { type: String },
         status: { type: String, default: 'Pending' },
-        method: { type: String, default: 'COD' }
+        method: { type: String, default: 'COD' },
+        razorpayOrderId: { type: String },
+        razorpayPaymentId: { type: String },
+        razorpaySignature: { type: String }
     },
     totalAmount: {
         type: Number,

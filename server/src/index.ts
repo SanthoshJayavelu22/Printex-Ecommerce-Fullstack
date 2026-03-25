@@ -32,30 +32,6 @@ import newsletterRoutes from './routes/subscriberRoutes';
 // Load env vars
 dotenv.config();
 
-// Connect to database
-connectDB().then(async () => {
-    try {
-        let admin = await User.findOne({ email: 'admin@printixlabels.com' });
-        if (!admin) {
-            admin = new User({
-                name: 'Super Admin',
-                email: 'admin@printixlabels.com',
-                password: 'password123',
-                role: 'super-admin'
-            });
-            await admin.save();
-            console.log("Super Admin seeded: admin@printixlabels.com | password123");
-        } else if (admin.role !== 'super-admin') {
-            admin.role = 'super-admin';
-            admin.password = 'password123';
-            await admin.save();
-            console.log("Super Admin updated: admin@printixlabels.com | password123");
-        }
-    } catch (e) {
-        console.error("Auto admin creation failed", e);
-    }
-});
-
 const app = express();
 
 // Body parser
@@ -63,34 +39,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Enable CORS
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "http://127.0.0.1:5173",
-  "http://127.0.0.1:3000",
-  "https://printixlabels.com",
-  "https://www.printixlabels.com",
-  "http://printixlabels.com",
-  "http://www.printixlabels.com",
-  
-
-];
-
-const corsOptions: cors.CorsOptions = {
-  origin: function (origin, callback) {
-    // Also check for common domain variations or allow all in dev if needed
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes(origin + '/') || (origin && origin.includes('printixlabels.com'))) {
-      callback(null, true);
-    } else {
-      console.warn(`Origin rejected by CORS: ${origin}`);
-      callback(null, true); // Temporarily allow all while debugging if preferred, but let's just make it match
-    }
-  },
-  credentials: true,
-};
-app.use(cors(corsOptions));
+// CORS is handled in app.ts
 
 // Security Middlewares
 app.use(helmet({
@@ -139,25 +88,51 @@ app.get('/', (req: Request, res: Response) => {
 // Global Error Handler  
 app.use(errorHandler); 
     
-const PORT = process.env.PORT || 5000;   
+const startServer = async () => {
+    try {
+        await connectDB();
+        
+        // Auto-seed admin
+        const adminEmail = 'admin@printixlabels.com';
+        let admin = await User.findOne({ email: adminEmail });
+        if (!admin) {
+            admin = new User({
+                name: 'Super Admin',
+                email: adminEmail,
+                password: 'password123',
+                role: 'super-admin'
+            });
+            await admin.save();
+            console.log(`Super Admin seeded: ${adminEmail} | password123`);
+        }
 
-const server = app.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-});
+        const PORT = process.env.PORT || 5000;   
+        const serverInstance = app.listen(PORT, () => {
+            console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+        });
 
-// Handle server errors
-server.on('error', (err: any) => {
-    if (err.code === 'EADDRINUSE') {
-        console.error(`Port ${PORT} is already in use. Please kill the process or use a different port.`);
-    } else {
-        console.error(`Server error: ${err.message}`);
+        // Handle server errors
+        serverInstance.on('error', (err: any) => {
+            if (err.code === 'EADDRINUSE') {
+                console.error(`Port ${PORT} is already in use.`);
+            } else {
+                console.error(`Server error: ${err.message}`);
+            }
+            process.exit(1);
+        });
+
+        // Handle unhandled promise rejections
+        process.on('unhandledRejection', (err: any) => {
+            console.log(`Error: ${err.message}`);
+            serverInstance.close(() => process.exit(1));
+        });
+
+    } catch (err: any) {
+        console.error('SERVER FATAL START ERROR:', err.message);
+        process.exit(1);
     }
-    process.exit(1);
-});
+};
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err: any, promise) => {
-    console.log(`Error: ${err.message}`);
-    // Close server & exit process
-    server.close(() => process.exit(1));
-});
+startServer();
+
+

@@ -45,6 +45,8 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState<any>(null);
   const [applyingCoupon, setApplyingCoupon] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [confirmedOrder, setConfirmedOrder] = useState<any>(null);
 
   useEffect(() => {
     if (!cartLoading && (!cart || cart.items.length === 0)) {
@@ -119,10 +121,18 @@ export default function CheckoutPage() {
     }
   };
 
+  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+
   const handlePlaceOrder = async () => {
     if (!selectedAddress) return;
     setLoading(true);
     try {
+      let order, razorpayOrder;
+
+      // If we already have an order created but payment was dismissed, use it
+      // Note: This is a simplification, ideally refresh order status or just allow new one
+      // But for better UX, we just proceed with creation for now but ensure status handling
+      
       const orderData = {
         shippingAddress: selectedAddress,
         paymentMethod: paymentMethod,
@@ -139,7 +149,9 @@ export default function CheckoutPage() {
         throw new Error(result.message || 'Failed to create order');
       }
 
-      const { order, razorpayOrder } = result.data;
+      order = result.data.order;
+      razorpayOrder = result.data.razorpayOrder;
+      setActiveOrderId(order._id);
 
       if (paymentMethod === 'Razorpay' && razorpayOrder) {
         const res = await loadRazorpayScript();
@@ -171,13 +183,15 @@ export default function CheckoutPage() {
               });
 
               if (verifyRes.success) {
+                setConfirmedOrder(verifyRes.data || order);
+                setIsSuccessModalOpen(true);
                 clearCart();
-                router.push(`/orders/${order._id}`);
               } else {
-                alert('Payment verification failed. Please contact support.');
+                throw new Error('Payment verification failed');
               }
             } catch (err: any) {
-              alert(err.message || 'Verification failed');
+              alert(err.message || 'Verification failed. Please check your order history.');
+              router.push('/orders');
             } finally {
               setLoading(false);
             }
@@ -188,24 +202,32 @@ export default function CheckoutPage() {
             contact: selectedAddress.phone
           },
           theme: {
-            color: "#4f46e5"
+            color: "#254441"
           },
           modal: {
             ondismiss: function() {
               setLoading(false);
+              // alert('Payment was cancelled. You can try again from your orders page.');
             }
           }
         };
 
         const paymentObject = new (window as any).Razorpay(options);
+        paymentObject.on('payment.failed', function (response: any) {
+          console.error('Payment Failed:', response.error);
+          alert(`Payment Failed: ${response.error.description}`);
+          setLoading(false);
+        });
         paymentObject.open();
       } else {
+        setConfirmedOrder(order);
+        setIsSuccessModalOpen(true);
         clearCart();
-        router.push(`/orders/${order._id}`);
       }
     } catch (err: any) {
       console.error(err);
-      alert(err.message || 'Something went wrong');
+      alert(err.message || 'Something went wrong while placing your order');
+      setLoading(false);
     }
   };
 
@@ -537,6 +559,49 @@ export default function CheckoutPage() {
         </div>
       </div>
       <Footer />
+
+      {/* Success Modal */}
+      {isSuccessModalOpen && confirmedOrder && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" />
+          <div className="relative bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] p-10 shadow-[0_30px_100px_rgba(0,0,0,0.2)] animate-in zoom-in-95 slide-in-from-bottom-10 duration-500">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-24 h-24 bg-emerald-50 dark:bg-emerald-500/10 rounded-full flex items-center justify-center mb-6 animate-pulse">
+                <CheckCircle2 className="w-12 h-12 text-emerald-500" />
+              </div>
+              
+              <h2 className="text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter mb-2">Order Confirmed!</h2>
+              <p className="text-slate-500 dark:text-slate-400 font-medium mb-8">Your premium labels are now in production.</p>
+              
+              <div className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-3xl p-6 mb-8 border border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-4 text-sm">
+                <div className="text-left">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Order ID</p>
+                  <p className="font-bold text-slate-900 dark:text-white truncate">#{confirmedOrder._id.toString().toUpperCase().slice(-8)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Amount</p>
+                  <p className="font-bold text-indigo-600 italic">₹{confirmedOrder.totalAmount.toLocaleString()}</p>
+                </div>
+              </div>
+
+              <div className="w-full space-y-3">
+                <Link 
+                  href={`/orders/${confirmedOrder._id}`}
+                  className="block w-full bg-indigo-600 hover:bg-black text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-xl shadow-indigo-500/20 transition-all active:scale-95 text-sm"
+                >
+                  View Order Details
+                </Link>
+                <Link 
+                  href="/"
+                  className="block w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold py-4 rounded-xl transition-all text-sm"
+                >
+                  Continue Shopping
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchApi, setAuthToken, removeAuthToken, getAuthToken } from '@/lib/api';
+import { useRouter } from 'next/navigation';
 
 interface User {
   id: string;
@@ -21,6 +22,7 @@ interface AuthContextType {
   logout: () => void;
   updateProfile: (data: any) => Promise<void>;
   refreshUser: () => Promise<void>;
+  verifyOTP: (email: string, otp: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,6 +30,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const token = getAuthToken();
@@ -60,9 +63,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const register = async (userData: any) => {
-    const { token, user } = await fetchApi('/auth/register', {
+    await fetchApi('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
+    });
+  };
+
+  const verifyOTP = async (email: string, otp: string) => {
+    const { token, user } = await fetchApi('/auth/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp }),
     });
     setAuthToken(token);
     setUser(user);
@@ -71,6 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     removeAuthToken();
     setUser(null);
+    router.push('/');
   };
 
   const updateProfile = async (data: any) => {
@@ -82,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile, refreshUser: loadUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile, refreshUser: loadUser, verifyOTP }}>
       {children}
     </AuthContext.Provider>
   );

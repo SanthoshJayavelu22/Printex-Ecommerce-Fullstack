@@ -49,9 +49,9 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
       data = {};
     }
 
-    if (!response.ok) {
-      const errorMsg = data.message || data.error || (response.status === 401 ? 'Unauthorized request' : 'Server Error');
-      const error: any = new Error(errorMsg);
+  if (!response.ok) {
+    const errorMsg = data.debugMsg || data.error || data.message || (response.status === 401 ? 'Unauthorized request' : 'Server Error');
+    const error: any = new Error(errorMsg);
       error.status = response.status;
       throw error;
     }

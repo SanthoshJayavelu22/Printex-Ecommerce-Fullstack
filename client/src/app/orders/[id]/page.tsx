@@ -128,17 +128,26 @@ export default function OrderDetailsPage() {
                </div>
 
                {/* Payment Info */}
-               <div className="space-y-4">
-                 <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                   <CreditCard className="w-4 h-4 text-primary" /> Payment Info
-                 </h3>
-                 <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
-                    <p className="font-black text-slate-900 dark:text-white mb-2">{order.paymentMethod}</p>
-                    <div className="flex items-center gap-2 mt-4 text-green-600 font-bold bg-green-100 dark:bg-green-500/10 px-3 py-1.5 rounded-lg w-fit text-xs uppercase tracking-wider">
-                      <ShieldCheck className="w-4 h-4" /> Paid via {order.paymentMethod}
-                    </div>
-                 </div>
-               </div>
+                <div className="space-y-4">
+                  <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-primary" /> Payment Info
+                  </h3>
+                  <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
+                    <p className="font-black text-slate-900 dark:text-white mb-2">{order.paymentInfo?.method || order.paymentMethod}</p>
+                    {order.paymentInfo?.status === 'Paid' ? (
+                      <div className="flex items-center gap-2 mt-4 text-green-600 font-bold bg-green-100 dark:bg-green-500/10 px-3 py-1.5 rounded-lg w-fit text-xs uppercase tracking-wider">
+                        <ShieldCheck className="w-4 h-4" /> Paid Successfully
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 mt-4 text-amber-600 font-bold bg-amber-100 dark:bg-amber-500/10 px-3 py-1.5 rounded-lg w-fit text-xs uppercase tracking-wider">
+                        <Clock className="w-4 h-4" /> Payment {order.paymentInfo?.status || 'Pending'}
+                      </div>
+                    )}
+                    {order.paymentInfo?.id && (
+                      <p className="text-[10px] text-slate-400 mt-2">Trans ID: {order.paymentInfo.id}</p>
+                    )}
+                  </div>
+                </div>
              </div>
 
              {/* Items Table */}

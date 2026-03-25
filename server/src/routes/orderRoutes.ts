@@ -13,11 +13,13 @@ const router = express.Router();
 import { protect, authorize } from '../middleware/authMiddleware';
 import roles from '../constants/roles';
 
+import { orderValidators } from '../middleware/validations/commonValidations';
+
 // Apply protection to all routes
 router.use(protect);
 
 router.route('/')
-    .post(createOrder)
+    .post(orderValidators, createOrder)
     .get(authorize(roles.ADMIN, roles.SUPER_ADMIN), getAllOrders);
 
 router.route('/myorders')

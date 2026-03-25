@@ -116,7 +116,7 @@ export default function Hero() {
               Upload Design | Select Size | Choose Qty
             </div>
             
-            <h1 ref={titleRef} className="text-6xl md:text-[7rem] xl:text-[8.5rem] font-black text-black mb-6 leading-[0.8] tracking-tighter uppercase relative">
+            <h1 ref={titleRef} className="text-5xl sm:text-7xl md:text-[7rem] xl:text-[8.5rem] font-black text-black mb-6 leading-[0.8] tracking-tighter uppercase relative">
               <div className="overflow-hidden pb-4"><div className="reveal-text">CUSTOM</div></div>
               <div className="overflow-hidden pb-4 relative">
                 <div className="reveal-text flex items-center justify-center lg:justify-start gap-4">

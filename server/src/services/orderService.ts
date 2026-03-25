@@ -103,8 +103,10 @@ class OrderService {
             paymentInfo: {
                 method: paymentMethod || 'COD',
                 status: paymentMethod === 'Razorpay' ? 'Pending' : 'Processing',
-                id: razorpayOrder ? razorpayOrder.id : null
+                razorpayOrderId: razorpayOrder ? razorpayOrder.id : undefined,
+                id: razorpayOrder ? razorpayOrder.id : undefined
             },
+            orderStatus: paymentMethod === 'Razorpay' ? 'Pending' : 'Processing',
             totalAmount,
             coupon: couponCode ? { code: couponCode, discount } : undefined
         });
@@ -184,6 +186,13 @@ class OrderService {
         order.orderStatus = 'Cancelled';
         await order.save();
 
+        // Send notifications (async)
+        const populatedOrder = await Order.findById(order._id).populate('user');
+        if (populatedOrder && populatedOrder.user) {
+            emailService.sendOrderStatusEmail(populatedOrder.user, populatedOrder).catch(err => console.error('Email status update error:', err));
+            whatsappService.sendOrderStatusUpdate(populatedOrder.user, populatedOrder).catch(err => console.error('WhatsApp status update error:', err));
+        }
+
         return order;
     }
 
@@ -215,6 +224,14 @@ class OrderService {
         }
 
         await order.save();
+
+        // Send notifications (async)
+        const populatedOrder = await Order.findById(order._id).populate('user');
+        if (populatedOrder && populatedOrder.user) {
+            emailService.sendOrderStatusEmail(populatedOrder.user, populatedOrder).catch(err => console.error('Email status update error:', err));
+            whatsappService.sendOrderStatusUpdate(populatedOrder.user, populatedOrder).catch(err => console.error('WhatsApp status update error:', err));
+        }
+
         return order;
     }
 }

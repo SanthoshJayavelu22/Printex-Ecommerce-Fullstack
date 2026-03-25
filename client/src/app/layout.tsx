@@ -47,6 +47,8 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
+import { ToastProvider } from '@/contexts/ToastContext'
+
 export default function RootLayout({
   children,
 }: {
@@ -57,11 +59,13 @@ export default function RootLayout({
       <body className="antialiased selection:bg-[#254441] selection:text-white bg-white text-black dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <AuthProvider>
-            <CartProvider>
-              <SettingsProvider>
-                {children}
-              </SettingsProvider>
-            </CartProvider>
+            <ToastProvider>
+              <CartProvider>
+                <SettingsProvider>
+                  {children}
+                </SettingsProvider>
+              </CartProvider>
+            </ToastProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
