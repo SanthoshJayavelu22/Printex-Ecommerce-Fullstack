@@ -59,7 +59,9 @@ class OrderService {
                 selectedShape: item.selectedShape,
                 selectedMaterial: item.selectedMaterial || item.selectedFinish,
                 selectedFinish: item.selectedFinish || item.selectedMaterial,
-                image: item.product.images?.[0]
+                image: item.product.images?.[0],
+                designUrl: item.designUrl,
+                needsDesign: item.needsDesign
             });
         }
 
@@ -102,7 +104,7 @@ class OrderService {
             shippingAddress,
             paymentInfo: {
                 method: paymentMethod || 'COD',
-                status: paymentMethod === 'Razorpay' ? 'Pending' : 'Processing',
+                status: paymentMethod === 'Razorpay' ? 'Pending' : 'COD',
                 razorpayOrderId: razorpayOrder ? razorpayOrder.id : undefined,
                 id: razorpayOrder ? razorpayOrder.id : undefined
             },

@@ -431,7 +431,7 @@ export default function CheckoutPage() {
                         <div key={item._id} className="p-4 flex gap-4 items-center">
                           <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden relative border border-slate-100 dark:border-slate-800">
                             <Image 
-                              src={item.designUrl ? getImageUrl(item.designUrl) : getImageUrl(item.product?.mainImage)} 
+                              src={item.designUrl ? getImageUrl(item.designUrl) : getImageUrl(item.product?.images?.[0])} 
                               alt={item.product?.name} 
                               fill 
                               className="object-contain" 
@@ -595,7 +595,7 @@ export default function CheckoutPage() {
               </div>
 
               <div className="bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10 rounded-2xl p-4 mb-8 w-full">
-                <p className="text-xs text-emerald-800 dark:text-emerald-400 font-medium">Estimated Arrival: <span className="font-black">3-5 Business Days</span></p>
+                <p className="text-xs text-emerald-800 dark:text-emerald-400 font-medium">Estimated Arrival: <span className="font-black">2-3 Business Days</span></p>
               </div>
 
               <div className="w-full space-y-3">

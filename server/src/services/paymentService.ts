@@ -161,7 +161,7 @@ export const markExpiredOrdersAsFailed = async () => {
         
         const expiredOrders = await Order.find({
             'paymentInfo.status': 'Pending',
-            'orderStatus': 'Processing', // Only those that haven't been confirmed
+            'orderStatus': 'Pending', // Razorpay orders stay in Pending until paid
             createdAt: { $lt: sixtyMinutesAgo }
         });
 

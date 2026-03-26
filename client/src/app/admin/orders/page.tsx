@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchApi } from "@/lib/api";
-import { Package, Search, Calendar, ChevronDown, CheckCircle, Clock, RefreshCw, Truck, X, Save, Eye, MapPin, Phone, User as UserIcon, MoreVertical, ExternalLink } from "lucide-react";
+import { fetchApi, getImageUrl } from "@/lib/api";
+import { Package, Search, Calendar, ChevronDown, CheckCircle, Clock, RefreshCw, Truck, X, Save, Eye, MapPin, Phone, User as UserIcon, MoreVertical, ExternalLink, Download } from "lucide-react";
 import { useAlertModal } from "@/contexts/ModalContext";
 
 export default function AdminOrders() {
@@ -389,14 +389,31 @@ export default function AdminOrders() {
                           {selectedOrder?.items?.map((item: any, idx: number) => (
                             <div key={idx} className="flex items-center gap-4 bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
                                {item.image ? (
-                                 <img src={item.image} alt={item.name} className="h-12 w-12 rounded-xl object-cover" />
+                                 <img src={getImageUrl(item.image)} alt={item.name} className="h-12 w-12 rounded-xl object-cover" />
                                ) : (
                                  <div className="h-12 w-12 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center">
                                    <Package size={20} className="text-slate-300" />
                                  </div>
                                )}
                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs font-black text-slate-900 dark:text-white truncate">{item.name}</p>
+                                  <div className="flex justify-between items-start gap-2">
+                                     <p className="text-xs font-black text-slate-900 dark:text-white truncate">{item.name}</p>
+                                     {item.designUrl ? (
+                                        <a 
+                                          href={getImageUrl(item.designUrl)} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest border border-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20"
+                                          download
+                                        >
+                                          <Download size={10} /> Download
+                                        </a>
+                                     ) : item.needsDesign && (
+                                        <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-600 rounded-lg text-[9px] font-black uppercase tracking-widest border border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20">
+                                          <Clock size={10} /> Needs Design
+                                        </span>
+                                     )}
+                                  </div>
                                   <div className="flex flex-wrap gap-x-2 gap-y-1 mt-1">
                                      {item.selectedShape && <span className="text-[9px] font-black uppercase text-slate-400 border border-slate-100 dark:border-slate-800 px-1.5 py-0.5 rounded">{item.selectedShape}</span>}
                                      {item.selectedSize && <span className="text-[9px] font-black uppercase text-slate-400 border border-slate-100 dark:border-slate-800 px-1.5 py-0.5 rounded">{item.selectedSize}</span>}
