@@ -575,7 +575,7 @@ export default function CheckoutPage() {
               <h2 className="text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter mb-2">Order Confirmed!</h2>
               <p className="text-slate-500 dark:text-slate-400 font-medium mb-8">Your premium labels are now in production.</p>
               
-              <div className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-3xl p-6 mb-8 border border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-4 text-sm">
+              <div className="w-full bg-slate-50 dark:bg-slate-800/50 rounded-3xl p-6 mb-8 border border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-y-6 gap-x-4 text-sm">
                 <div className="text-left">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Order ID</p>
                   <p className="font-bold text-slate-900 dark:text-white truncate">#{confirmedOrder._id.toString().toUpperCase().slice(-8)}</p>
@@ -584,6 +584,18 @@ export default function CheckoutPage() {
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Amount</p>
                   <p className="font-bold text-indigo-600 italic">₹{confirmedOrder.totalAmount.toLocaleString()}</p>
                 </div>
+                <div className="text-left border-t border-slate-100 dark:border-slate-800 pt-4">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Payment</p>
+                  <p className="font-bold text-slate-900 dark:text-white">{confirmedOrder.paymentInfo?.method || 'Online'}</p>
+                </div>
+                <div className="text-right border-t border-slate-100 dark:border-slate-800 pt-4">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Date</p>
+                  <p className="font-bold text-slate-900 dark:text-white">{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                </div>
+              </div>
+
+              <div className="bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10 rounded-2xl p-4 mb-8 w-full">
+                <p className="text-xs text-emerald-800 dark:text-emerald-400 font-medium">Estimated Arrival: <span className="font-black">3-5 Business Days</span></p>
               </div>
 
               <div className="w-full space-y-3">

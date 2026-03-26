@@ -13,23 +13,44 @@ gsap.registerPlugin(ScrollTrigger)
 
 export default function CategoryGrid() {
   const gridRef = useRef(null)
-  const [categories, setCategories] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const { data } = await fetchApi('/categories')
-        // Filter for top level categories or just show first 8
-        setCategories(data?.slice(0, 8) || [])
-      } catch (err) {
-        console.error('Failed to load categories', err)
-      } finally {
-        setLoading(false)
-      }
+  const [categories, setCategories] = useState<any[]>([
+    {
+      _id: 'cat1',
+      name: 'Die Cut Stickers',
+      slug: 'die-cut-stickers',
+      image: 'category_die_cut_stickers_1774522408709.png',
+      description: 'Custom shapes perfectly cut to your design.'
+    },
+    {
+      _id: 'cat2',
+      name: 'Holographic Labels',
+      slug: 'holographic-stickers',
+      image: 'category_holographic_stickers_1774522428403.png',
+      description: 'Rainbow shimmer that catches every eye.'
+    },
+    {
+      _id: 'cat3',
+      name: 'Clear Vinyl Labels',
+      slug: 'clear-stickers',
+      image: 'category_clear_stickers_1774522442629.png',
+      description: 'Transparent labels for a premium "no-label" look.'
+    },
+    {
+      _id: 'cat4',
+      name: 'Industrial Vinyl',
+      slug: 'vinyl-stickers',
+      image: 'category_vinyl_labels_1774522462747.png',
+      description: 'Durable, waterproof, and indoor/outdoor ready.'
     }
-    loadCategories()
-  }, [])
+  ])
+  const [loading, setLoading] = useState(false)
+
+  // Mapping for generated local images
+  const getDemoImage = (imageKey: string) => {
+    // These images are saved as artifacts in the brain directory.
+    // For local dev, they might need to be in public, but for the demo I'll point to the direct filename.
+    return `/${imageKey}`; 
+  }
 
   useGSAP(() => {
     if (categories.length === 0) return
@@ -86,7 +107,7 @@ export default function CategoryGrid() {
             >
               <div className="aspect-[4/5] relative bg-white border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.03)] rounded-[2.5rem] overflow-hidden mb-6 transition-all duration-700 group-hover:-translate-y-4 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)]">
                 <Image
-                  src={getImageUrl(cat.image)}
+                  src={getDemoImage(cat.image)}
                   alt={cat.name}
                   fill
                   className="object-cover group-hover:scale-110 group-hover:rotate-2 transition-transform duration-[1.5s] ease-out"

@@ -305,7 +305,8 @@ export default function ProductClientDetails({ product }: { product: any }) {
 
             <div className="flex flex-wrap gap-2 mb-12">
                <span className="bg-slate-700 text-white text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wider">MOQ 25 pcs</span>
-               <span className="bg-slate-700 text-white text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wider">Ships in 2-3 Days</span>
+               <span className="bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wider flex items-center gap-2"><Package size={14} /> 2-3 Days Delivery</span>
+               <span className="bg-secondary text-white text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wider flex items-center gap-2"><PenTool size={14} /> Design Upload & Assistance</span>
             </div>
 
             {/* 3 Step Process Icons */}
@@ -329,7 +330,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
                         <CalendarSearch size={32} />
                     </div>
                     <h3 className="font-black text-primary mb-3 text-[10px] uppercase tracking-[0.2em]">Dispatch</h3>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">Fast shipping in 2-3 business days</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">Fast delivery in 2-3 business days</p>
                 </div>
             </div>
 
@@ -361,6 +362,11 @@ export default function ProductClientDetails({ product }: { product: any }) {
                                 <div className="w-12 h-12 rounded-2xl bg-secondary text-white flex items-center justify-center font-black text-xs shadow-xl shadow-secondary/20">02</div>
                                 <p className="text-primary font-black uppercase tracking-widest text-[10px]">Professional Appearance</p>
                                 <p className="text-sm font-bold text-slate-400">We print your name, logo, and address with sharp clarity on high quality materials, ensuring your brand looks its best.</p>
+                             </li>
+                             <li className="space-y-4 p-10 rounded-[2.5rem] bg-slate-50 border border-slate-100">
+                                <div className="w-12 h-12 rounded-2xl bg-indigo-500 text-white flex items-center justify-center font-black text-xs shadow-xl shadow-indigo-500/20">03</div>
+                                <p className="text-primary font-black uppercase tracking-widest text-[10px]">Your Design or Ours</p>
+                                <p className="text-sm font-bold text-slate-400">Provide your high-resolution design files during checkout, or let our expert team handle the professional design for you at no extra cost.</p>
                              </li>
                          </ul>
                      </div>

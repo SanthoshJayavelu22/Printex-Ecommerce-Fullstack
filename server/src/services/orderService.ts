@@ -116,11 +116,11 @@ class OrderService {
             cart.items = [];
             await cart.save();
 
-            // Send confirmation email (async)
-            emailService.sendOrderConfirmationEmail(user, order).catch((err: any) => console.error('Email error:', err));
-            
-            // Send WhatsApp confirmation (async)
-            whatsappService.sendOrderConfirmation(user, order).catch((err: any) => console.error('WhatsApp error:', err));
+            // Send confirmation email ONLY if it's not a pending online payment
+            if (order.paymentInfo.status !== 'Pending') {
+                emailService.sendOrderConfirmationEmail(user, order).catch((err: any) => console.error('Order Confirmation Email error:', err));
+                whatsappService.sendOrderConfirmation(user, order).catch((err: any) => console.error('Order Confirmation WhatsApp error:', err));
+            }
         }
 
         return {
@@ -209,6 +209,11 @@ class OrderService {
         const { status, trackingNumber, courierName, trackingUrl } = updateData;
 
         if (status) {
+            // Restriction: Admin cannot change status if payment is Pending
+            if (order.paymentInfo.status === 'Pending' && order.paymentInfo.method === 'Razorpay') {
+                throw new ErrorResponse('Cannot update order status while payment is Pending.', 400);
+            }
+
             order.orderStatus = status;
             if (status === 'Delivered') {
                 order.deliveredAt = new Date();

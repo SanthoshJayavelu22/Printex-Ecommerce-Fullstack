@@ -13,22 +13,53 @@ gsap.registerPlugin(ScrollTrigger)
 
 export default function FeaturedProducts() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [products, setProducts] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const loadFeatured = async () => {
-      try {
-        const { data } = await fetchApi('/products?limit=4&isActive=true')
-        setProducts(data || [])
-      } catch (err) {
-        console.error('Failed to load featured products', err)
-      } finally {
-        setLoading(false)
-      }
+  const [products, setProducts] = useState<any[]>([
+    {
+      _id: 'prod1',
+      name: 'Business Logo Stickers',
+      slug: 'business-logo-stickers',
+      price: 15,
+      images: ['product_logo_stickers_1774522483379.png'],
+      defaultMaterial: 'White Vinyl',
+      defaultSize: '3" x 3"',
+      defaultQuantity: 50
+    },
+    {
+      _id: 'prod2',
+      name: 'Luxury Gold Foiled Labels',
+      slug: 'luxury-gold-labels',
+      price: 25,
+      images: ['product_gold_foiled_label_1774522499888.png'],
+      defaultMaterial: 'Gold Foil',
+      defaultSize: '2" x 2"',
+      defaultQuantity: 100
+    },
+    {
+      _id: 'prod3',
+      name: 'Boutique QR Codes',
+      slug: 'qr-code-stickers',
+      price: 12,
+      images: ['product_qr_code_stickers_1774522516918.png'],
+      defaultMaterial: 'Matte Vinyl',
+      defaultSize: '2" x 2"',
+      defaultQuantity: 50
+    },
+    {
+      _id: 'prod4',
+      name: 'Waterproof Beverage Labels',
+      slug: 'waterproof-labels',
+      price: 18,
+      images: ['product_waterproof_labels_1774522532560.png'],
+      defaultMaterial: 'BOPP Plastic',
+      defaultSize: '4" x 2"',
+      defaultQuantity: 50
     }
-    loadFeatured()
-  }, [])
+  ])
+  const [loading, setLoading] = useState(false)
+
+  const getDemoImage = (imageKey: string) => {
+    return `/${imageKey}`;
+  }
 
   useGSAP(() => {
     if (products.length === 0) return
@@ -88,7 +119,7 @@ export default function FeaturedProducts() {
                 material={product.defaultMaterial || 'Premium Quality'}
                 rating={5}
                 price={product.price}
-                image={getImageUrl(product.images?.[0])}
+                image={getDemoImage(product.images?.[0])}
                 size={product.defaultSize}
                 qty={product.defaultQuantity}
               />

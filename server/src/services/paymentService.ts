@@ -2,6 +2,8 @@ import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import ErrorResponse from '../utils/errorResponse';
 import Order from '../models/Order';
+import * as emailService from './emailService';
+import User from '../models/User';
 
 let razorpay: any;
 
@@ -134,8 +136,18 @@ export const verifyAndProcessPayment = async (paymentData: any) => {
     order.paymentInfo.id = razorpay_payment_id;
     order.paymentInfo.razorpayPaymentId = razorpay_payment_id;
     order.paymentInfo.razorpaySignature = razorpay_signature;
-    order.orderStatus = 'Confirmed'; // Marked as confirmed after payment
+    order.orderStatus = 'Processing'; // Set to processing after payment
     await order.save();
+
+    // Send confirmation emails after successful payment
+    try {
+        const user = await User.findById(order.user);
+        if (user) {
+            emailService.sendOrderConfirmationEmail(user, order).catch(err => console.error('[PAYMENT] Email error:', err));
+        }
+    } catch (err) {
+        console.error('[PAYMENT] Error finding user for email:', err);
+    }
 
     return order;
 };
