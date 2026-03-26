@@ -1,5 +1,6 @@
 import cartService from '../services/cartService';
 import asyncHandler from '../middleware/asyncHandler';
+import path from 'path';
 
 // @desc    Get current user's cart
 // @route   GET /api/cart
@@ -18,7 +19,9 @@ export const getCart = asyncHandler(async (req, res, next) => {
 export const addItem = asyncHandler(async (req, res, next) => {
     const itemData = { ...req.body };
     if (req.file) {
-        itemData.designUrl = req.file.path;
+        // Normalize path to use forward slashes and ensure it starts with 'public/'
+        // This ensures compatibility across Windows and Linux VPS environments
+        itemData.designUrl = req.file.path.split(/[\\/]/).join('/').replace(/^.*public\//, 'public/');
         itemData.needsDesign = false;
     } else if (req.body.needsDesign === 'true' || req.body.needsDesign === true) {
         itemData.needsDesign = true;

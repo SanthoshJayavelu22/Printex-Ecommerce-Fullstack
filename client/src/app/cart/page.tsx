@@ -52,7 +52,7 @@ export default function CartPage() {
                       {/* Image */}
                       <div className="relative w-full sm:w-32 h-32 bg-slate-100 dark:bg-slate-800 rounded-2xl overflow-hidden shadow-inner border border-slate-100 dark:border-slate-800 flex items-center justify-center p-2">
                         <img
-                          src={item.designUrl ? getImageUrl(item.designUrl) : getImageUrl(item.product?.mainImage)}
+                          src={item.designUrl ? getImageUrl(item.designUrl) : getImageUrl(item.product?.images?.[0] || item.product?.mainImage)}
                           alt={item.product?.name || 'Product'}
                           className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 mix-blend-multiply dark:mix-blend-normal"
                         />

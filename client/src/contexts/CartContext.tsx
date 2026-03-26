@@ -11,6 +11,7 @@ interface CartItem {
     name: string;
     price: number;
     mainImage: string;
+    images?: string[];
     stock: number;
     minOrderQuantity: number;
   };

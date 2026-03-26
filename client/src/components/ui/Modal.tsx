@@ -50,7 +50,7 @@ export const Modal = ({
         {showClose && (
           <button 
             onClick={onClose}
-            className="absolute top-8 right-8 text-slate-300 hover:text-red-500 transition-colors"
+            className="absolute top-8 right-8 text-slate-300 hover:text-red-500 transition-colors z-50"
           >
             <XCircle className="w-8 h-8" />
           </button>

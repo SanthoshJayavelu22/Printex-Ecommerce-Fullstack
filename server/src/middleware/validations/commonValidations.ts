@@ -13,7 +13,6 @@ export const validateResult = (req: Request, res: Response, next: NextFunction) 
 
 export const orderValidators = [
     body('shippingAddress').notEmpty().withMessage('Shipping address is required'),
-    body('items').isArray({ min: 1 }).withMessage('At least one item is required'),
     body('paymentMethod').notEmpty().withMessage('Payment method is required'),
     validateResult
 ];

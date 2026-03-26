@@ -184,6 +184,20 @@ export default function ProductClientDetails({ product }: { product: any }) {
     }
   };
 
+  const handleNextImage = () => {
+    if (!product.images || product.images.length <= 1) return;
+    const currentIndex = product.images.indexOf(activeImage);
+    const nextIndex = (currentIndex + 1) % product.images.length;
+    setActiveImage(product.images[nextIndex]);
+  };
+
+  const handlePrevImage = () => {
+    if (!product.images || product.images.length <= 1) return;
+    const currentIndex = product.images.indexOf(activeImage);
+    const prevIndex = (currentIndex - 1 + product.images.length) % product.images.length;
+    setActiveImage(product.images[prevIndex]);
+  };
+
   useGSAP(() => {
       const sections = gsap.utils.toArray('.ux-anim-section');
       sections.forEach((section: any) => {
@@ -264,7 +278,10 @@ export default function ProductClientDetails({ product }: { product: any }) {
                 
                 {/* Main Image */}
                 <div className="flex-1 rounded-xl overflow-hidden relative flex items-center justify-center min-h-[300px] sm:min-h-[420px]">
-                    <button className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-colors z-20">
+                    <button 
+                      onClick={handlePrevImage}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-colors z-20"
+                    >
                         <ChevronLeft size={20} className="text-slate-600"/>
                     </button>
                     {activeImage ? (
@@ -272,7 +289,10 @@ export default function ProductClientDetails({ product }: { product: any }) {
                     ) : (
                         <div className="text-slate-400">No Image Available</div>
                     )}
-                    <button className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-colors z-20">
+                    <button 
+                      onClick={handleNextImage}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-colors z-20"
+                    >
                         <ChevronRight size={20} className="text-slate-600"/>
                     </button>
                 </div>
@@ -473,11 +493,11 @@ export default function ProductClientDetails({ product }: { product: any }) {
                   <h2 className="text-4xl sm:text-5xl md:text-7xl font-black text-black uppercase tracking-tighter mb-12">Related <br/><span className="text-gray-200">Items.</span></h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
                      {(product.relatedProducts && product.relatedProducts.length > 0 ? product.relatedProducts : [
-                         {_id: '1', name: 'Vinyl Die-Cut Stickers', slug: 'vinyl-die-cut-stickers', images: ['https://images.unsplash.com/photo-1572375958540-bbfe49cf9330?auto=format&fit=crop&q=80']},
-                         {_id: '2', name: 'Packaging Box Sleeves', slug: 'packaging-box-sleeves', images: ['https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=80']},
-                         {_id: '3', name: 'Holographic Labels', slug: 'holographic-labels', images: ['https://images.unsplash.com/photo-1544022613-e87ea75a7a1f?auto=format&fit=crop&q=80']}
+                         {_id: '1', name: 'Vinyl Die-Cut Stickers', slug: '#', images: ['https://images.unsplash.com/photo-1572375958540-bbfe49cf9330?auto=format&fit=crop&q=80']},
+                         {_id: '2', name: 'Packaging Box Sleeves', slug: '#', images: ['https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&q=80']},
+                         {_id: '3', name: 'Holographic Labels', slug: '#', images: ['https://images.unsplash.com/photo-1544022613-e87ea75a7a1f?auto=format&fit=crop&q=80']}
                      ]).map((rp: any) => (
-                         <Link href={`/product/${rp.slug}`} key={rp._id} className="group flex flex-col transition-all duration-700">
+                         <Link href={rp.slug === '#' ? '#' : `/product/${rp.slug}`} key={rp._id} className="group flex flex-col transition-all duration-700">
                              <div className="aspect-[3/4] bg-gray-50 rounded-[2.5rem] relative overflow-hidden p-12 mb-8 group-hover:shadow-2xl transition-all duration-700">
                                  {rp.images?.[0] ? (
                                      <img src={getImageUrl(rp.images[0])} alt={rp.name} className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-[1.5s]" />

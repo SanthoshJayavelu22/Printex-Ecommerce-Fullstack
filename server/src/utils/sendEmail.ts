@@ -29,9 +29,14 @@ const sendEmail = async (options: EmailOptions): Promise<void> => {
         html: options.html
     };
 
-    const info = await transporter.sendMail(message);
-
-    console.log('Message sent: %s', info.messageId);
+    try {
+        const info = await transporter.sendMail(message);
+        console.log('[EMAIL] Message sent: %s', info.messageId);
+    } catch (error: any) {
+        console.error('[EMAIL] Delivery failed:', error.message);
+        // Throw so the calling service knows it failed, but we log it gracefully
+        throw error;
+    }
 };
 
 export default sendEmail;
