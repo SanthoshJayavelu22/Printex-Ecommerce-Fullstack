@@ -68,11 +68,11 @@ export const createProduct = async (productData: any, files: any, adminId: any) 
     if (productData.defaultMaterial === '') productData.defaultMaterial = '';
 
     let images: string[] = [];
-    if (files) {
-        if (files.mainImage) {
+    if (files && (files.mainImage || files.additionalImages)) {
+        if (files.mainImage && files.mainImage[0]) {
             images.push(files.mainImage[0].path.replace(/\\/g, '/'));
         }
-        if (files.additionalImages) {
+        if (files.additionalImages && Array.isArray(files.additionalImages)) {
             files.additionalImages.forEach((file: any) => images.push(file.path.replace(/\\/g, '/')));
         }
     } else if (productData.images && Array.isArray(productData.images)) {
@@ -151,24 +151,39 @@ export const updateProduct = async (productId: string, updateData: any, files: a
     // Handle image updates if provided in files or existingImages
     let mergedImages: string[] = [];
 
-    // existingImages might be an array or string
-    if (updateData.existingImages && typeof updateData.existingImages === 'string') {
-        mergedImages.push(updateData.existingImages);
-    } else if (Array.isArray(updateData.existingImages)) {
-        mergedImages = [...updateData.existingImages];
+    // existingImages might be an array or string (from FormData)
+    if (updateData.existingImages) {
+        if (typeof updateData.existingImages === 'string') {
+            // Check if it's not an empty string or "[]"
+            if (updateData.existingImages.trim() !== '' && updateData.existingImages !== '[]') {
+                try {
+                    const parsed = JSON.parse(updateData.existingImages);
+                    if (Array.isArray(parsed)) {
+                        mergedImages = parsed;
+                    } else {
+                        mergedImages.push(updateData.existingImages);
+                    }
+                } catch (e) {
+                    mergedImages.push(updateData.existingImages);
+                }
+            }
+        } else if (Array.isArray(updateData.existingImages)) {
+            mergedImages = [...updateData.existingImages];
+        }
     }
 
-    if (files && (files.mainImage || files.additionalImages)) {
-        if (files.mainImage) {
+    const hasNewFiles = files && (files.mainImage || files.additionalImages);
+    if (hasNewFiles) {
+        if (files.mainImage && files.mainImage[0]) {
             mergedImages.unshift(files.mainImage[0].path.replace(/\\/g, '/'));
         }
-        if (files.additionalImages) {
+        if (files.additionalImages && Array.isArray(files.additionalImages)) {
              files.additionalImages.forEach((file: any) => mergedImages.push(file.path.replace(/\\/g, '/')));
         }
     }
     
-    // Always update images array if editing (this handles deletions correctly too)
-    if (mergedImages.length > 0 || updateData.existingImages !== undefined || files) {
+    // Always update images array if editing and we have a definitive set of images or new files
+    if (hasNewFiles || updateData.existingImages !== undefined) {
          updateData.images = mergedImages;
     }
 

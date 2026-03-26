@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { fetchApi, getImageUrl } from "@/lib/api";
 import { Plus, Trash2, ImageIcon, Search, X, Edit, MoveVertical, ExternalLink } from "lucide-react";
+import { useAlertModal } from "@/contexts/ModalContext";
 
 export default function AdminBanners() {
   const [banners, setBanners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const { showAlert, showConfirm } = useAlertModal();
 
   // Form State
   const [title, setTitle] = useState("");
@@ -56,7 +58,7 @@ export default function AdminBanners() {
       if (imageFile) {
         formData.append("image", imageFile);
       } else if (!editingId) {
-        alert("Please select an image for the new banner");
+        showAlert("Missing Image", "Please select an image for the new banner", "info");
         return;
       }
       
@@ -76,7 +78,7 @@ export default function AdminBanners() {
       handleCancelForm();
       loadBanners();
     } catch (err: any) {
-      alert(err.message || "Failed to save banner");
+      showAlert("Save Error", err.message || "Failed to save banner", "error");
     }
   };
 
@@ -105,13 +107,22 @@ export default function AdminBanners() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm(`Are you sure you want to delete this banner?`)) return;
-    try {
-      await fetchApi(`/banners/${id}`, { method: "DELETE" });
-      loadBanners();
-    } catch (err: any) {
-      alert(err.message || "Failed to delete banner");
-    }
+    showConfirm(
+      "Delete Banner",
+      "Are you sure you want to delete this banner? It will be removed from the homepage slider.",
+      async () => {
+        try {
+          await fetchApi(`/banners/${id}`, { method: "DELETE" });
+          loadBanners();
+          showAlert("Deleted", "Banner has been removed successfully.", "success");
+        } catch (err: any) {
+          console.error(err);
+          showAlert("Delete Error", err.message || "Failed to delete banner", "error");
+        }
+      },
+      undefined,
+      "alert"
+    );
   };
 
   return (

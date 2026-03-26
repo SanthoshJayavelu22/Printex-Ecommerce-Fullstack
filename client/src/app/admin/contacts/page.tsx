@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/api";
 import { Search, Mail, Phone, Calendar, Trash2, CheckCircle2, MessageSquare, ExternalLink, ChevronRight, User } from "lucide-react";
+import { useAlertModal } from "@/contexts/ModalContext";
 
 export default function AdminContacts() {
   const [inquiries, setInquiries] = useState<any[]>([]);
@@ -10,6 +11,7 @@ export default function AdminContacts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedInquiry, setSelectedInquiry] = useState<any>(null);
   const [filter, setFilter] = useState("all"); // all, unread, replied
+  const { showAlert, showConfirm } = useAlertModal();
 
   useEffect(() => {
     loadInquiries();
@@ -41,14 +43,23 @@ export default function AdminContacts() {
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (!confirm(`Are you sure you want to delete this inquiry?`)) return;
-    try {
-      await fetchApi(`/contacts/${id}`, { method: "DELETE" });
-      loadInquiries();
-      if (selectedInquiry?._id === id) setSelectedInquiry(null);
-    } catch (err: any) {
-      alert(err.message || "Failed to delete inquiry");
-    }
+    showConfirm(
+      "Delete Inquiry",
+      "Are you sure you want to delete this inquiry? This action cannot be undone.",
+      async () => {
+        try {
+          await fetchApi(`/contacts/${id}`, { method: "DELETE" });
+          loadInquiries();
+          if (selectedInquiry?._id === id) setSelectedInquiry(null);
+          showAlert("Deleted", "Inquiry has been removed.", "success");
+        } catch (err: any) {
+          console.error(err);
+          showAlert("Delete Error", err.message || "Failed to delete inquiry", "error");
+        }
+      },
+      undefined,
+      "alert"
+    );
   };
 
   const filteredInquiries = inquiries.filter(i => {

@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/api";
 import { Settings, Save, Mail, Phone, MapPin, Globe, Share2, Search, ImageIcon, Layout, Type } from "lucide-react";
+import { useAlertModal } from "@/contexts/ModalContext";
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("general"); // general, social, seo
+  const { showAlert } = useAlertModal();
 
   useEffect(() => {
     loadSettings();
@@ -34,9 +36,9 @@ export default function AdminSettings() {
         method: "PUT",
         body: JSON.stringify(settings)
       });
-      alert("Settings updated successfully!");
+      showAlert("Success", "Settings updated successfully!", "success");
     } catch (err: any) {
-      alert(err.message || "Update failed");
+      showAlert("Update Error", err.message || "Update failed", "error");
     } finally {
       setSaving(false);
     }

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Mail, Phone, MapPin, ArrowRight, Activity, Globe, Send, MessageSquare } from 'lucide-react';
 import { useSettings } from '@/contexts/SettingsContext';
 import { fetchApi } from '@/lib/api';
+import { useAlertModal } from '@/contexts/ModalContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Image from 'next/image';
@@ -19,6 +20,7 @@ if (typeof window !== 'undefined') {
 export default function ContactPage() {
   const { settings } = useSettings();
   const [loading, setLoading] = useState(false);
+  const { showAlert } = useAlertModal();
   const containerRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -37,11 +39,11 @@ export default function ContactPage() {
         body: JSON.stringify(formData)
       });
       if (res.success) {
-        alert("Transmission Received. Our team will contact you shortly.");
+        showAlert('Success', "Transmission Received. Our team will contact you shortly.", 'success');
         setFormData({ name: '', email: '', phone: '', subject: 'General Inquiry', message: '' });
       }
     } catch (err: any) {
-      alert(err.message || "Uplink Failed. Please try again.");
+      showAlert('Error', err.message || "Uplink Failed. Please try again.", 'error');
     } finally {
       setLoading(false);
     }

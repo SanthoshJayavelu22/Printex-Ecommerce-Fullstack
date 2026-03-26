@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/api";
 import { Package, Search, Calendar, ChevronDown, CheckCircle, Clock, RefreshCw, Truck, X, Save, Eye, MapPin, Phone, User as UserIcon, MoreVertical, ExternalLink } from "lucide-react";
+import { useAlertModal } from "@/contexts/ModalContext";
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -10,6 +11,7 @@ export default function AdminOrders() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const { showAlert } = useAlertModal();
 
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,9 +58,9 @@ export default function AdminOrders() {
       });
       setIsModalOpen(false);
       loadOrders();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to update order");
+      showAlert("Update Error", err.message || "Failed to update order", "error");
     }
   };
 
@@ -69,9 +71,9 @@ export default function AdminOrders() {
         body: JSON.stringify({ status: newStatus }),
       });
       loadOrders(); 
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Failed to update status");
+      showAlert("Update Error", err.message || "Failed to update status", "error");
     }
   };
 

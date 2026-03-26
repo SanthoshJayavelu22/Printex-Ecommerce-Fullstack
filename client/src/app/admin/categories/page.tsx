@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/api";
 import { Plus, Trash2, ListTree, Search, ChevronRight, ChevronDown, MoveVertical, X } from "lucide-react";
+import { useAlertModal } from "@/contexts/ModalContext";
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState<any[]>([]);
@@ -12,6 +13,7 @@ export default function AdminCategories() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [draggedId, setDraggedId] = useState<string | null>(null);
+  const { showAlert, showConfirm } = useAlertModal();
   
   // Expanded nodes state
   const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({});
@@ -74,7 +76,7 @@ export default function AdminCategories() {
       loadCategories();
     } catch (err: any) {
       console.error(err);
-      alert(err.message || "Failed to save category");
+      showAlert("Error", err.message || "Failed to save category", "error");
     }
   };
 
@@ -134,20 +136,28 @@ export default function AdminCategories() {
       });
       loadCategories();
     } catch(err: any) {
-      alert("Error moving category");
+      showAlert("Move Error", "Error moving category", "error");
     }
     setDraggedId(null);
   };
 
   const handleDelete = async (id: string, catName: string) => {
-    if (!confirm(`Are you sure you want to delete the category "${catName}"?`)) return;
-    try {
-      await fetchApi(`/categories/${id}`, { method: "DELETE" });
-      loadCategories();
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Failed to delete category");
-    }
+    showConfirm(
+      "Delete Category",
+      `Are you sure you want to delete the category "${catName}"? This action cannot be undone and may affect associated products.`,
+      async () => {
+        try {
+          await fetchApi(`/categories/${id}`, { method: "DELETE" });
+          loadCategories();
+          showAlert("Deleted", "Category has been removed successfully.", "success");
+        } catch (err: any) {
+          console.error(err);
+          showAlert("Delete Error", err.message || "Failed to delete category", "error");
+        }
+      },
+      undefined,
+      "alert"
+    );
   };
 
   const RenderTree = ({ nodes }: { nodes: any[] }) => {

@@ -12,12 +12,14 @@ mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/printix_lab
             name: 'Super Admin',
             email: 'admin@printixlabels.com',
             password: 'password123',
-            role: 'super-admin'
+            role: 'super-admin',
+            isVerified: true
         });
         await admin.save();
         console.log("Admin created: admin@printixlabels.com | password123");
     } else {
         admin.role = 'super-admin';
+        admin.isVerified = true;
         await admin.save();
         console.log("Admin updated: admin@printixlabels.com | password123");
     }

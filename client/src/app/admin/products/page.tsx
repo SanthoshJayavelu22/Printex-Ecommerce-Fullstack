@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { fetchApi, getImageUrl, API_URL } from "@/lib/api";
 import { Plus, Trash2, Edit, Search, Filter, Box, RefreshCw, X } from "lucide-react";
+import { useAlertModal } from "@/contexts/ModalContext";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<any[]>([]);
@@ -13,6 +14,7 @@ export default function AdminProducts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const { showAlert, showConfirm } = useAlertModal();
 
   // Form State
   const [formData, setFormData] = useState({
@@ -122,7 +124,7 @@ export default function AdminProducts() {
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (imagePreviews.length === 0 && selectedCategories.length === 0) {
-      alert("Please upload at least one image and select at least one category.");
+      showAlert("Missing Data", "Please upload at least one image and select at least one category.", "info");
       return;
     }
 
@@ -183,7 +185,7 @@ export default function AdminProducts() {
       loadProducts();
     } catch (err: any) {
       console.error(err);
-      alert(err.message || "Failed to save product");
+      showAlert("Error", err.message || "Failed to save product", "error");
     }
   };
 
@@ -287,14 +289,22 @@ export default function AdminProducts() {
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to delete ${name}?`)) return;
-    try {
-      await fetchApi(`/products/${id}`, { method: "DELETE" });
-      loadProducts();
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Failed to delete product");
-    }
+    showConfirm(
+      "Delete Product",
+      `Are you sure you want to delete ${name}? This action cannot be undone.`,
+      async () => {
+        try {
+          await fetchApi(`/products/${id}`, { method: "DELETE" });
+          loadProducts();
+          showAlert("Deleted", "Product has been removed successfully.", "success");
+        } catch (err: any) {
+          console.error(err);
+          showAlert("Delete Error", err.message || "Failed to delete product", "error");
+        }
+      },
+      undefined,
+      "alert"
+    );
   };
 
   const renderCategoryCheckboxes = (nodes: any[], level = 0) => {

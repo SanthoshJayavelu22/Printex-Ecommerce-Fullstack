@@ -9,6 +9,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
+import { useAlertModal } from "@/contexts/ModalContext";
 import DesignUploadModal from "@/components/DesignUploadModal";
 import MaterialSelector from "@/components/MaterialSelector";
 import { fetchApi, getImageUrl } from "@/lib/api";
@@ -25,6 +26,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
   const { user } = useAuth();
   const { addToCart } = useCart();
   const router = useRouter();
+  const { showAlert } = useAlertModal();
 
 
   // Form selections matching defaults
@@ -101,7 +103,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
       await fetchApi(`/wishlist/${product._id}`, { method: 'POST' });
       setIsInWishlist(!isInWishlist);
     } catch (err: any) {
-      alert(err.message || "Action failed");
+      showAlert('Wishlist Error', err.message || "Action failed", 'error');
     }
   };
 
@@ -118,11 +120,11 @@ export default function ProductClientDetails({ product }: { product: any }) {
         body: JSON.stringify(newReview)
       });
       if (res.success) {
-        alert("Review submitted! It will appear once approved by admin.");
+        showAlert('Review Submitted', "Review submitted! It will appear once approved by admin.", 'success');
         setNewReview({ rating: 5, comment: '' });
       }
     } catch (err: any) {
-      alert(err.message || "Failed to submit review");
+      showAlert('Review Error', err.message || "Failed to submit review", 'error');
     } finally {
       setSubmittingReview(false);
     }
@@ -132,7 +134,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
     if (!material) {
         setMaterialError(true);
         // Scroll to material selector or just show alert
-        alert("Please select a material before proceeding.");
+        showAlert('Selection Required', "Please select a material before proceeding.", 'info');
         return;
     }
     setMaterialError(false);
@@ -176,7 +178,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
       await addToCart(formData);
       router.push('/cart');
     } catch (err: any) {
-      alert(err.message || 'Failed to add to cart');
+      showAlert('Cart Error', err.message || 'Failed to add to cart', 'error');
     } finally {
       setPurchaseLoading(false);
     }

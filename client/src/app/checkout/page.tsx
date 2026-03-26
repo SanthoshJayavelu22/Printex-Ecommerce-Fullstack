@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useAlertModal } from '@/contexts/ModalContext';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -27,6 +28,7 @@ export default function CheckoutPage() {
   const { cart, loading: cartLoading, clearCart } = useCart();
   const { user, updateProfile } = useAuth();
   const router = useRouter();
+  const { showAlert } = useAlertModal();
   
   const [step, setStep] = useState(1); // 1: Shipping, 2: Payment/Review
   const [loading, setLoading] = useState(false);
@@ -94,7 +96,7 @@ export default function CheckoutPage() {
         setDiscount(res.data);
       }
     } catch (err: any) {
-      alert(err.message || 'Invalid coupon');
+      showAlert('Invalid Coupon', err.message || 'Invalid coupon', 'error');
       setDiscount(null);
     } finally {
       setApplyingCoupon(false);
@@ -157,7 +159,7 @@ export default function CheckoutPage() {
         const res = await loadRazorpayScript();
 
         if (!res) {
-          alert('Razorpay SDK failed to load. Are you online?');
+          showAlert('Connection Error', 'Razorpay SDK failed to load. Are you online?', 'error');
           setLoading(false);
           return;
         }
@@ -190,7 +192,7 @@ export default function CheckoutPage() {
                 throw new Error('Payment verification failed');
               }
             } catch (err: any) {
-              alert(err.message || 'Verification failed. Please check your order history.');
+              showAlert('Payment Verification Error', err.message || 'Verification failed. Please check your order history.', 'error');
               router.push('/orders');
             } finally {
               setLoading(false);
@@ -215,7 +217,7 @@ export default function CheckoutPage() {
         const paymentObject = new (window as any).Razorpay(options);
         paymentObject.on('payment.failed', function (response: any) {
           console.error('Payment Failed:', response.error);
-          alert(`Payment Failed: ${response.error.description}`);
+          showAlert('Payment Failed', `Payment Failed: ${response.error.description}`, 'error');
           setLoading(false);
         });
         paymentObject.open();
@@ -226,7 +228,7 @@ export default function CheckoutPage() {
       }
     } catch (err: any) {
       console.error(err);
-      alert(err.message || 'Something went wrong while placing your order');
+      showAlert('Order Error', err.message || 'Something went wrong while placing your order', 'error');
       setLoading(false);
     }
   };

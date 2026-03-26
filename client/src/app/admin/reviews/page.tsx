@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/api";
 import { Star, Trash2, CheckCircle2, XCircle, Search, MessageSquare, Package, User } from "lucide-react";
+import { useAlertModal } from "@/contexts/ModalContext";
 
 export default function AdminReviews() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all"); // all, pending, approved
+  const { showAlert, showConfirm } = useAlertModal();
 
   useEffect(() => {
     loadReviews();
@@ -34,18 +36,26 @@ export default function AdminReviews() {
       });
       loadReviews();
     } catch (err: any) {
-      alert(err.message || "Failed to update review status");
+      showAlert("Update Error", err.message || "Failed to update review status", "error");
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm(`Are you sure you want to delete this review?`)) return;
-    try {
-      await fetchApi(`/reviews/${id}`, { method: "DELETE" });
-      loadReviews();
-    } catch (err: any) {
-      alert(err.message || "Failed to delete review");
-    }
+    showConfirm(
+      "Delete Review",
+      "Are you sure you want to delete this review? This action cannot be undone.",
+      async () => {
+        try {
+          await fetchApi(`/reviews/${id}`, { method: "DELETE" });
+          loadReviews();
+          showAlert("Deleted", "Review has been removed.", "success");
+        } catch (err: any) {
+          showAlert("Delete Error", err.message || "Failed to delete review", "error");
+        }
+      },
+      undefined,
+      "alert"
+    );
   };
 
   const filteredReviews = reviews.filter(r => {

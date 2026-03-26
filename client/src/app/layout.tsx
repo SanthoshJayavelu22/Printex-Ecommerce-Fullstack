@@ -48,6 +48,7 @@ export const viewport: Viewport = {
 }
 
 import { ToastProvider } from '@/contexts/ToastContext'
+import { ModalProvider } from '@/contexts/ModalContext'
 
 export default function RootLayout({
   children,
@@ -60,11 +61,13 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <AuthProvider>
             <ToastProvider>
-              <CartProvider>
-                <SettingsProvider>
-                  {children}
-                </SettingsProvider>
-              </CartProvider>
+              <ModalProvider>
+                <CartProvider>
+                  <SettingsProvider>
+                    {children}
+                  </SettingsProvider>
+                </CartProvider>
+              </ModalProvider>
             </ToastProvider>
           </AuthProvider>
         </ThemeProvider>

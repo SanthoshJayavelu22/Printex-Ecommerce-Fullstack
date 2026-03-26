@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/api";
 import { Trash2, Search, Users, ShieldAlert, BadgeCheck, Mail, RefreshCw, ChevronDown } from "lucide-react";
+import { useAlertModal } from "@/contexts/ModalContext";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
@@ -10,6 +11,7 @@ export default function AdminUsers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const { showAlert, showConfirm } = useAlertModal();
 
   useEffect(() => {
     loadUsers();
@@ -28,28 +30,44 @@ export default function AdminUsers() {
   };
 
   const handleRoleChange = async (id: string, newRole: string) => {
-    if (!confirm(`Are you sure you want to change this user's role to ${newRole}?`)) return;
-    try {
-      await fetchApi(`/users/${id}`, {
-        method: "PUT",
-        body: JSON.stringify({ role: newRole }),
-      });
-      loadUsers(); // Reload to update state
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update role");
-    }
+    showConfirm(
+      "Change User Role",
+      `Are you sure you want to change this user's role to ${newRole}? This affects their permissions.`,
+      async () => {
+        try {
+          await fetchApi(`/users/${id}`, {
+            method: "PUT",
+            body: JSON.stringify({ role: newRole }),
+          });
+          loadUsers();
+          showAlert("Updated", "User role has been updated successfully.", "success");
+        } catch (err: any) {
+          console.error(err);
+          showAlert("Update Error", err.message || "Failed to update role", "error");
+        }
+      },
+      undefined,
+      "info"
+    );
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Delete user ${name} permanently?`)) return;
-    try {
-      await fetchApi(`/users/${id}`, { method: "DELETE" });
-      loadUsers();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete user");
-    }
+    showConfirm(
+      "Delete User",
+      `Are you sure you want to delete user ${name} permanently? This action cannot be undone.`,
+      async () => {
+        try {
+          await fetchApi(`/users/${id}`, { method: "DELETE" });
+          loadUsers();
+          showAlert("Deleted", "User has been removed successfully.", "success");
+        } catch (err: any) {
+          console.error(err);
+          showAlert("Delete Error", err.message || "Failed to delete user", "error");
+        }
+      },
+      undefined,
+      "alert"
+    );
   };
 
   const filteredUsers = Array.isArray(users) 

@@ -5,11 +5,13 @@ import Link from 'next/link'
 import { Instagram, Facebook, Twitter, ArrowUp } from 'lucide-react'
 import { useSettings } from '@/contexts/SettingsContext'
 import { fetchApi } from '@/lib/api'
+import { useAlertModal } from '@/contexts/ModalContext'
 
 export default function Footer() {
   const { settings } = useSettings()
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const { showAlert } = useAlertModal();
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
@@ -29,11 +31,11 @@ export default function Footer() {
         body: JSON.stringify({ email })
       });
       if (res.success) {
-        alert(res.message);
+        showAlert('Success', res.message, 'success');
         setEmail('');
       }
     } catch (err: any) {
-      alert(err.message || 'Subscription failed');
+      showAlert('Error', err.message || 'Subscription failed', 'error');
     } finally {
       setSubmitting(false);
     }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/api";
 import { Plus, Trash2, Tag, Search, X, Edit, Calendar, Percent, Banknote } from "lucide-react";
+import { useAlertModal } from "@/contexts/ModalContext";
 
 export default function AdminCoupons() {
   const [coupons, setCoupons] = useState<any[]>([]);
@@ -10,6 +11,7 @@ export default function AdminCoupons() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const { showAlert, showConfirm } = useAlertModal();
 
   // Form State
   const [code, setCode] = useState("");
@@ -57,7 +59,7 @@ export default function AdminCoupons() {
       handleCancelForm();
       loadCoupons();
     } catch (err: any) {
-      alert(err.message || "Failed to save coupon");
+      showAlert("Error", err.message || "Failed to save coupon", "error");
     }
   };
 
@@ -87,13 +89,22 @@ export default function AdminCoupons() {
   };
 
   const handleDelete = async (id: string, couponCode: string) => {
-    if (!confirm(`Are you sure you want to delete coupon "${couponCode}"?`)) return;
-    try {
-      await fetchApi(`/coupons/${id}`, { method: "DELETE" });
-      loadCoupons();
-    } catch (err: any) {
-      alert(err.message || "Failed to delete coupon");
-    }
+    showConfirm(
+      "Delete Coupon",
+      `Are you sure you want to delete coupon "${couponCode}"?`,
+      async () => {
+        try {
+          await fetchApi(`/coupons/${id}`, { method: "DELETE" });
+          loadCoupons();
+          showAlert("Deleted", "Coupon has been removed successfully.", "success");
+        } catch (err: any) {
+          console.error(err);
+          showAlert("Delete Error", err.message || "Failed to delete coupon", "error");
+        }
+      },
+      undefined,
+      "alert"
+    );
   };
 
   const filteredCoupons = coupons.filter(c => 

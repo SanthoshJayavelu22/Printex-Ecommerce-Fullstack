@@ -6,6 +6,7 @@ import { useCart } from '@/contexts/CartContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { useAlertModal } from '@/contexts/ModalContext'
 
 interface ProductCardProps {
   id: string
@@ -25,6 +26,7 @@ export default function ProductCard({ id, slug, name, material, rating, price, i
   const { user } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const { showAlert } = useAlertModal()
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -42,7 +44,7 @@ export default function ProductCard({ id, slug, name, material, rating, price, i
       })
       // Optional: Show success toast or feedback
     } catch (err: any) {
-      alert(err.message || 'Failed to add to cart')
+      showAlert('Error', err.message || 'Failed to add to cart', 'error')
     } finally {
       setLoading(false)
     }
