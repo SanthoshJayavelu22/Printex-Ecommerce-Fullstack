@@ -263,7 +263,7 @@ export default function ProductClientDetails({ product }: { product: any }) {
                 )}
                 
                 {/* Main Image */}
-                <div className="flex-1 bg-[#F9ECE3] rounded-xl overflow-hidden relative flex items-center justify-center min-h-[300px] sm:min-h-[420px]">
+                <div className="flex-1 rounded-xl overflow-hidden relative flex items-center justify-center min-h-[300px] sm:min-h-[420px]">
                     <button className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 rounded-full flex items-center justify-center shadow-sm hover:bg-white transition-colors z-20">
                         <ChevronLeft size={20} className="text-slate-600"/>
                     </button>

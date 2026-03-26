@@ -46,25 +46,30 @@ export const registerUser = async (userData: any) => {
 
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log(`[AUTH] OTP generated for ${user.email || user.phoneNumber}: ${otp}`);
     user.otp = otp;
     user.otpExpire = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
 
     await user.save();
 
     try {
-        await Promise.all([
-            emailService.sendOTPEmail(user.email, otp),
-            whatsappService.sendOTP(user.phoneNumber as string, otp)
-        ]);
+        // Send notifications (errors are logged but not fatal)
+        emailService.sendOTPEmail(user.email, otp).catch(err => {
+            console.error('SMTP Error:', err.message);
+        });
+        
+        whatsappService.sendOTP(user.phoneNumber as string, otp).catch(err => {
+            console.error('WhatsApp Error:', err.message);
+        });
         
         return {
-            message: 'OTP sent to email and WhatsApp number'
+            message: 'Registration initiated. Please check your email/WhatsApp for OTP.'
         };
     } catch (err) {
-        user.otp = null;
-        user.otpExpire = null;
-        await user.save();
-        throw new ErrorResponse('Email could not be sent', 500);
+        console.error('Notification service error:', err);
+        return {
+            message: 'User created, but there was an error sending the OTP. Please contact admin.'
+        };
     }
 };
 
@@ -144,6 +149,7 @@ export const forgotPasswordService = async (email: string) => {
 
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log(`[FORGOT_PASSWORD] OTP generated for ${user.email}: ${otp}`);
     user.otp = otp;
     user.otpExpire = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
 
