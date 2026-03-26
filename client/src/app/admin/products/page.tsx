@@ -95,10 +95,22 @@ export default function AdminProducts() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const files = Array.from(e.target.files);
-      setImages(prev => [...prev, ...files]);
-      const newPreviews = files.map(file => URL.createObjectURL(file));
-      setImagePreviews(prev => [...prev, ...newPreviews]);
+      const allFiles = Array.from(e.target.files);
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      
+      const validFiles = allFiles.filter(file => {
+        if (file.size > maxSize) {
+          showAlert("File Too Large", `${file.name} exceeds the 5MB limit and was removed.`, "error");
+          return false;
+        }
+        return true;
+      });
+
+      if (validFiles.length > 0) {
+        setImages(prev => [...prev, ...validFiles]);
+        const newPreviews = validFiles.map(file => URL.createObjectURL(file));
+        setImagePreviews(prev => [...prev, ...newPreviews]);
+      }
     }
   };
 
@@ -734,7 +746,7 @@ export default function AdminProducts() {
                       </div>
                     )}
                 </div>
-                <p className="text-[10px] font-bold text-slate-400 italic">Upload up to 6 high-res JPG/PNG images.</p>
+                <p className="text-[10px] font-bold text-slate-400 italic">Upload up to 6 high-res JPG/PNG images (5MB max each).</p>
               </div>
 
               {/* Related Synergy */}

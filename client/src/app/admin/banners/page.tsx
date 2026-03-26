@@ -40,6 +40,13 @@ export default function AdminBanners() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      
+      if (file.size > maxSize) {
+        showAlert("File Too Large", "Banner image exceeds the 5MB limit.", "error");
+        return;
+      }
+
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
     }
@@ -215,7 +222,7 @@ export default function AdminBanners() {
             </div>
 
             <div className="space-y-4">
-              <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] ml-1">Banner Image (Recommended 1920x600)</label>
+              <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] ml-1">Banner Image (Recommended 1920x600, 5MB max)</label>
               <div 
                 onClick={() => document.getElementById('image-upload')?.click()}
                 className="aspect-[16/6] rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 flex flex-col items-center justify-center cursor-pointer hover:bg-white dark:hover:bg-slate-900 hover:border-indigo-400 dark:hover:border-indigo-600 transition-all overflow-hidden relative group"

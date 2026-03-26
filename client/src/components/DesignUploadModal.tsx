@@ -14,12 +14,20 @@ export default function DesignUploadModal({ isOpen, onClose, onContinue, product
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError('File too large (Max 5MB)');
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        return;
+      }
+      setError(null);
       setSelectedFile(file);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
@@ -97,7 +105,8 @@ export default function DesignUploadModal({ isOpen, onClose, onContinue, product
                   </div>
                   <div className="flex-1">
                     <h4 className="font-black text-slate-900 dark:text-white uppercase tracking-tight mb-1">Upload Design</h4>
-                    <p className="text-xs font-medium text-slate-500 mb-4">Upload your ready-to-print artwork files.</p>
+                    <p className="text-xs font-medium text-slate-500 mb-4">Upload ready-to-print artwork (5MB max).</p>
+                    {error && <p className="text-[10px] font-bold text-red-500 uppercase mb-2">{error}</p>}
                     
                     {!selectedFile ? (
                       <label className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-full cursor-pointer hover:bg-slate-800 transition-all">
