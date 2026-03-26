@@ -60,6 +60,46 @@ export const verifySignature = (orderId: string, paymentId: string, signature: s
 };
 
 /**
+ * Handle Razorpay Webhook Events
+ */
+export const handleWebhook = async (req: any) => {
+    const signature = req.headers['x-razorpay-signature'];
+    const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || process.env.RAZORPAY_KEY_SECRET;
+    
+    // Verify Webhook Signature
+    const expectedSignature = crypto
+        .createHmac("sha256", WEBHOOK_SECRET!)
+        .update(JSON.stringify(req.body))
+        .digest("hex");
+
+    if (expectedSignature !== signature) {
+        console.error('[WEBHOOK ERROR] Invalid Razorpay webhook signature.');
+        return false;
+    }
+
+    const event = req.body;
+    console.log(`[WEBHOOK] Received Razorpay event: ${event.event}`);
+
+    // Handle payment.failed event
+    if (event.event === 'payment.failed') {
+        const { payload } = event;
+        const razorpay_order_id = payload.payment.entity.order_id;
+        
+        if (razorpay_order_id) {
+            const order = await Order.findOne({ 'paymentInfo.razorpayOrderId': razorpay_order_id });
+            if (order && order.paymentInfo.status === 'Pending') {
+                order.paymentInfo.status = 'Failed';
+                order.orderStatus = 'Rejected';
+                await order.save();
+                console.log(`[WEBHOOK SUCCESS] Order #${order._id} marked as Failed due to payment.failed event.`);
+            }
+        }
+    }
+
+    return true;
+};
+
+/**
  * Verify payment and update order status
  */
 export const verifyAndProcessPayment = async (paymentData: any) => {
@@ -100,8 +140,38 @@ export const verifyAndProcessPayment = async (paymentData: any) => {
     return order;
 };
 
+/**
+ * Cleanup function to mark 'Pending' orders as 'Failed' if they are older than 60 minutes
+ */
+export const markExpiredOrdersAsFailed = async () => {
+    try {
+        const sixtyMinutesAgo = new Date(Date.now() - 60 * 60 * 1000);
+        
+        const expiredOrders = await Order.find({
+            'paymentInfo.status': 'Pending',
+            'orderStatus': 'Processing', // Only those that haven't been confirmed
+            createdAt: { $lt: sixtyMinutesAgo }
+        });
+
+        if (expiredOrders.length > 0) {
+            console.log(`[CLEANUP] Found ${expiredOrders.length} expired pending orders.`);
+            
+            for (const order of expiredOrders) {
+                order.paymentInfo.status = 'Failed';
+                order.orderStatus = 'Rejected';
+                await order.save();
+                console.log(`[CLEANUP] Order #${order._id} marked as Failed due to 60-min timeout.`);
+            }
+        }
+    } catch (error) {
+        console.error('[CLEANUP ERROR] Failed to cleanup expired orders:', error);
+    }
+};
+
 export default {
     createRazorpayOrder,
     verifySignature,
-    verifyAndProcessPayment
+    verifyAndProcessPayment,
+    markExpiredOrdersAsFailed,
+    handleWebhook
 };

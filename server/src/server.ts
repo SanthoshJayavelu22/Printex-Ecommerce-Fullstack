@@ -1,6 +1,7 @@
 import app from './app';
 import connectDB from './config/db';
 import User from './models/User';
+import { markExpiredOrdersAsFailed } from './services/paymentService';
 
 const PORT = process.env.PORT || 5000;
 
@@ -14,6 +15,11 @@ const startServer = async () => {
 
         const server = app.listen(PORT, () => {
             console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+            
+            // Start periodic cleanup for expired payments (every 15 minutes)
+            setInterval(() => {
+                markExpiredOrdersAsFailed();
+            }, 15 * 60 * 1000);
         });
 
         // Handle server errors

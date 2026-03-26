@@ -153,3 +153,18 @@ export const toggleWishlist = asyncHandler(async (req: AuthRequest, res: Respons
         wishlist 
     });
 });
+
+// @desc    Delete account
+// @route   DELETE /api/auth/profile
+// @access  Private
+export const deleteProfile = asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user) {
+        return next(new ErrorResponse('Not authorized', 401));
+    }
+    await authService.deleteAccountService(req.user.id);
+
+    res.status(200).json({ 
+        success: true, 
+        message: 'Account deleted successfully' 
+    });
+});

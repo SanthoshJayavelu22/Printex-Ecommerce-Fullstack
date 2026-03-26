@@ -9,7 +9,7 @@ import { User, Phone, Mail, Camera, Loader2, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, logout } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
@@ -28,10 +28,13 @@ export default function ProfilePage() {
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push("/login?redirect=/profile");
+      router.push("/");
     }
     if (user) {
       setFormData({
@@ -86,6 +89,19 @@ export default function ProfilePage() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    setDeleteLoading(true);
+    try {
+      await fetchApi("/auth/profile", {
+        method: "DELETE",
+      });
+      logout();
+    } catch (err: any) {
+      alert(err.message || "Failed to delete account");
+      setDeleteLoading(false);
+    }
+  };
+
   if (authLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
   return (
@@ -136,6 +152,17 @@ export default function ProfilePage() {
                   className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-2xl transition-all text-xs uppercase tracking-widest border border-white/10"
                 >
                   Change Password
+                </button>
+              </div>
+
+              <div className="bg-red-50 rounded-3xl p-8 border border-red-100">
+                <h3 className="text-lg font-black uppercase tracking-tight mb-4 text-red-600">Danger Zone</h3>
+                <p className="text-red-400 text-sm mb-6">Once you delete your account, there is no going back. Please be certain.</p>
+                <button 
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-2xl transition-all text-xs uppercase tracking-widest shadow-lg shadow-red-500/20"
+                >
+                  Delete Account
                 </button>
               </div>
             </div>
@@ -294,6 +321,41 @@ export default function ProfilePage() {
                  </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Account Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-300">
+            <div className="p-8 border-b border-red-50 flex justify-between items-center bg-red-50">
+              <h2 className="text-xl font-black text-red-600 uppercase tracking-tight">Delete Account</h2>
+              <button onClick={() => setIsDeleteModalOpen(false)} className="text-red-400 hover:text-red-600">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            
+            <div className="p-8 space-y-6">
+              <p className="text-slate-600 font-medium">Are you absolutely sure you want to delete your account? This action cannot be undone and you will lose all your order history and saved addresses.</p>
+              
+              <div className="flex gap-4">
+                 <button 
+                  type="button"
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  className="flex-1 bg-slate-50 text-slate-600 font-bold py-4 rounded-2xl text-xs uppercase tracking-widest"
+                 >
+                   Cancel
+                 </button>
+                 <button 
+                  disabled={deleteLoading}
+                  onClick={handleDeleteAccount}
+                  className="flex-[2] bg-red-600 text-white font-black py-4 rounded-2xl text-xs uppercase tracking-widest flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-red-700 transition-all shadow-lg shadow-red-500/20"
+                 >
+                   {deleteLoading ? <Loader2 className="animate-spin" size={16} /> : "Yes, Delete Everything"}
+                 </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

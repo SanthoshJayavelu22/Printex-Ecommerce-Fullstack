@@ -12,3 +12,16 @@ export const verifyPayment = asyncHandler(async (req, res, next) => {
         data: order
     });
 });
+
+// @desc    Razorpay webhook
+// @route   POST /api/payment/razorpay-webhook
+// @access  Public (Signature verified)
+export const razorpayWebhook = asyncHandler(async (req, res, next) => {
+    const success = await paymentService.handleWebhook(req);
+    
+    // Always return 200 to Razorpay to avoid retries
+    res.status(200).json({
+        success: success,
+        message: success ? 'Webhook processed' : 'Signature verification failed'
+    });
+});

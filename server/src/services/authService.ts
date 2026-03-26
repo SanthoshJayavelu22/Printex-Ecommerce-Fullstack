@@ -21,10 +21,23 @@ const generateToken = (id: string | any) => {
 export const registerUser = async (userData: any) => {
     const { name, email, password, role, phoneNumber } = userData;
 
-    // Check if user exists
-    let user = await User.findOne({ email });
+    // Check if user exists by email OR phone
+    let user = await User.findOne({ 
+        $or: [
+            { email: email.toLowerCase() }, 
+            { phoneNumber }
+        ] 
+    });
     
     if (user) {
+        // Validation check: if someone else uses an already-taken phone or email
+        if (user.email.toLowerCase() !== email.toLowerCase()) {
+            throw new ErrorResponse('This phone number is already registered with another account', 400);
+        }
+        if (user.phoneNumber !== phoneNumber) {
+            throw new ErrorResponse('This email is already registered with another account', 400);
+        }
+
         if (user.isVerified) {
             throw new ErrorResponse('User already exists', 400);
         }
@@ -114,7 +127,7 @@ export const verifyRegisterOTP = async (email: string, otp: string) => {
  * Login user
  */
 export const loginUser = async (email: string, password: string) => {
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
     if (!user || !(await (user as any).matchPassword(password))) {
         throw new ErrorResponse('Invalid credentials', 401);
@@ -280,6 +293,25 @@ export const toggleWishlistService = async (userId: string, productId: string) =
     return user.wishlist;
 };
 
+/**
+ * Delete account
+ */
+export const deleteAccountService = async (userId: string) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new ErrorResponse('User not found', 404);
+    }
+
+    if (user.role === 'super-admin') {
+        throw new ErrorResponse('Super Admin account cannot be deleted', 400);
+    }
+
+    // You might want to also clean up orders, or keep them but remove user ref
+    // For now, simple deletion
+    await User.findByIdAndDelete(userId);
+    return true;
+};
+
 export default {
     registerUser,
     loginUser,
@@ -290,5 +322,6 @@ export default {
     updateProfileService,
     addAddressService,
     removeAddressService,
-    toggleWishlistService
+    toggleWishlistService,
+    deleteAccountService
 };

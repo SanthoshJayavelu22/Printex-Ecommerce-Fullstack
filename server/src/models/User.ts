@@ -55,6 +55,8 @@ const userSchema: Schema<IUser> = new Schema({
     },
     phoneNumber: {
         type: String,
+        unique: true,
+        sparse: true, // Allows multiple null/missing phone numbers if needed, but unique if present
         trim: true
     },
     profilePicture: {

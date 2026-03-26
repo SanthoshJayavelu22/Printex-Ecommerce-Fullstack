@@ -9,7 +9,8 @@ import {
     addAddress, 
     removeAddress, 
     toggleWishlist,
-    verifyOTP
+    verifyOTP,
+    deleteProfile
 } from '../controllers/authController';
 import { protect, authorize } from '../middleware/authMiddleware';
 import { validateRegister, validateLogin, validateResetPassword } from '../middleware/validations/authValidations';
@@ -28,6 +29,7 @@ router.put('/updateprofile', protect, updateProfile);
 router.post('/address', protect, addAddress);
 router.delete('/address/:id', protect, removeAddress);
 router.post('/wishlist/:productId', protect, toggleWishlist);
+router.delete('/profile', protect, deleteProfile);
 
 router.get('/admin-only', protect, authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN), (req, res) => {
     res.status(200).json({ success: true, message: 'Welcome Admin' });

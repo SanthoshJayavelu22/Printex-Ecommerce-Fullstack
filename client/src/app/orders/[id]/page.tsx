@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { getImageUrl } from '@/lib/api';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
@@ -67,30 +69,37 @@ export default function OrderDetailsPage() {
   };
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950">
-      <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-    </div>
+    <>
+      <Header />
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 pt-44 pb-20">
+        <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+      </div>
+      <Footer />
+    </>
   );
 
   if (!order) return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-slate-950">
-      <h2 className="text-2xl font-bold mb-4">Order not found</h2>
-      <Link href="/orders" className="text-secondary font-semibold underline">Back to orders</Link>
-    </div>
+    <>
+      <Header />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-slate-950 pt-44 pb-20">
+        <h2 className="text-2xl font-bold mb-4">Order not found</h2>
+        <Link href="/orders" className="text-secondary font-semibold underline">Back to orders</Link>
+      </div>
+      <Footer />
+    </>
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <Link href="/orders" className="flex items-center gap-2 text-slate-500 hover:text-secondary group transition-colors">
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-semibold">All Orders</span>
-          </Link>
-          <button className="flex items-center gap-2 text-primary hover:text-secondary font-bold bg-white dark:bg-slate-900 px-6 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all active:scale-95">
-            <Download className="w-4 h-4" /> Download Invoice
-          </button>
-        </div>
+    <>
+      <Header />
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-44 pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <Link href="/orders" className="flex items-center gap-2 text-slate-500 hover:text-secondary group transition-colors">
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+              <span className="font-semibold">All Orders</span>
+            </Link>
+          </div>
 
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xl shadow-primary/5 mb-8">
           {/* Order Status Banner */}
@@ -230,7 +239,9 @@ export default function OrderDetailsPage() {
             Continue Shopping <ChevronRight className="w-5 h-5" />
           </Link>
         </div>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }
