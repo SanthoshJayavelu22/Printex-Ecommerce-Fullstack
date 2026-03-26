@@ -34,7 +34,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push("/");
+      router.replace("/");
     }
     if (user) {
       setFormData({

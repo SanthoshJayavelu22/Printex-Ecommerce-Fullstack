@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { MapPin, Plus, Trash2, Home, Briefcase, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { fetchApi } from '@/lib/api';
 
 import Header from '@/components/Header';
@@ -11,6 +12,14 @@ import Footer from '@/components/Footer';
 
 export default function AddressesPage() {
   const { user, updateProfile, loading: authLoading } = useAuth();
+  const router = useRouter();
+  
+  React.useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace('/');
+    }
+  }, [user, authLoading, router]);
+
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [newAddress, setNewAddress] = useState({

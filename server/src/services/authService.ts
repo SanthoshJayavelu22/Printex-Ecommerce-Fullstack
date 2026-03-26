@@ -218,11 +218,20 @@ export const getUserProfile = async (userId: string) => {
  * Update User Profile
  */
 export const updateProfileService = async (userId: string, updateData: any) => {
-    const { name, phoneNumber } = updateData;
+    const { name, phoneNumber, role } = updateData;
     
+    // Check if trying to set super-admin
+    if (role === 'super-admin') {
+        const existingSuperAdmin = await User.findOne({ role: 'super-admin' });
+        if (existingSuperAdmin && existingSuperAdmin._id.toString() !== userId) {
+            throw new ErrorResponse('There can only be one Super Admin. Please downgrade the existing one first.', 400);
+        }
+    }
+
     const fieldsToUpdate: any = {};
     if (name) fieldsToUpdate.name = name;
     if (phoneNumber) fieldsToUpdate.phoneNumber = phoneNumber;
+    if (role) fieldsToUpdate.role = role;
 
     const user = await User.findByIdAndUpdate(userId, fieldsToUpdate, {
         new: true,

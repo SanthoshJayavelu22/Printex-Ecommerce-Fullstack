@@ -32,7 +32,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push('/');
+      router.replace('/');
     }
   }, [user, loading, router]);
 

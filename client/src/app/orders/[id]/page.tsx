@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { fetchApi } from '@/lib/api';
 import Link from 'next/link';
 import { 
@@ -26,9 +27,16 @@ import Footer from '@/components/Footer';
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
+  const { user, loading: authLoading } = useAuth();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace('/');
+    }
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     const fetchOrder = async () => {

@@ -137,90 +137,98 @@ export default function AdminUsers() {
           </div>
         </div>
 
-        <div className="p-8">
+        <div className="p-0">
           {loading && users.length === 0 ? (
-            <div className="p-24 text-center">
+            <div className="p-32 text-center">
               <div className="h-12 w-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-6"></div>
               <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Loading users...</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {currentUsers.length > 0 ? currentUsers.map((user: any) => (
-                <div key={user._id} className="group relative bg-slate-50/50 dark:bg-slate-955/50 border border-transparent dark:border-slate-800/50 rounded-[2rem] p-6 hover:bg-white dark:hover:bg-slate-800 hover:shadow-2xl hover:shadow-black/5 dark:hover:shadow-black/20 hover:-translate-y-2 transition-all duration-500 flex flex-col">
-                  {user.role !== 'super-admin' && (
-                    <button 
-                      onClick={() => handleDelete(user._id, user.name)} 
-                      className="absolute top-4 right-4 h-10 w-10 rounded-2xl bg-white dark:bg-slate-900 text-rose-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-500 hover:text-white shadow-sm ring-1 ring-slate-100 dark:ring-slate-700 z-10"
-                      title="Delete User"
-                    >
-                      <Trash2 size={16} strokeWidth={2.5} />
-                    </button>
-                  )}
-
-                  <div className="flex flex-col items-center text-center mt-2 flex-grow">
-                    <div className="relative mb-6">
-                      <div className={`h-24 w-24 rounded-[2rem] flex items-center justify-center text-2xl font-black shadow-xl transition-all duration-500 group-hover:rotate-6 ${
-                        user.role === 'super-admin' ? 'bg-gradient-to-br from-rose-500 to-rose-700 text-white shadow-rose-500/20' : 
-                        user.role === 'admin' ? 'bg-gradient-to-br from-primary to-[#3a635f] text-white shadow-primary/20' : 
-                        'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 shadow-slate-200/50'
-                      }`}>
-                        {(user.name || "U")[0].toUpperCase()}
-                      </div>
-                      <div className={`absolute -bottom-2 -right-2 p-2 rounded-xl border-4 border-white dark:border-slate-800 shadow-md ${
-                        user.role === 'super-admin' ? 'bg-purple-600 text-white' :
-                        user.role === 'admin' ? 'bg-indigo-600 text-white' :
-                        'bg-slate-400 text-white'
-                      }`}>
-                        {getRoleIcon(user.role)}
-                      </div>
-                    </div>
-
-                    <h3 className="text-lg font-black text-slate-900 dark:text-white truncate w-full px-2 mt-2 leading-tight" title={user.name}>{user.name}</h3>
-                    <div className="flex items-center gap-2 mt-2 px-4 py-1.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm w-full">
-                       <Mail size={12} className="shrink-0 text-slate-400" /> 
-                       <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate tracking-tight">{user.email}</p>
-                    </div>
-
-                    <div className="w-full mt-8">
-                       <label className="text-[9px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] mb-2 block text-left ml-1">User Role</label>
-                       <div className="relative group/select">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-100 dark:border-slate-800">
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">User Profile</th>
+                    <th className="px-6 py-5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Contact Info</th>
+                    <th className="px-6 py-5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center">Authorization</th>
+                    <th className="px-6 py-5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Join Date</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
+                  {currentUsers.length > 0 ? currentUsers.map((user: any) => (
+                    <tr key={user._id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-4">
+                          <div className={`h-12 w-12 rounded-2xl flex items-center justify-center text-sm font-black shadow-sm ${
+                            user.role === 'super-admin' ? 'bg-rose-500 text-white shadow-rose-500/10' : 
+                            user.role === 'admin' ? 'bg-primary text-white shadow-primary/10' : 
+                            'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                          }`}>
+                            {(user.name || "U")[0].toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="text-sm font-black text-slate-900 dark:text-white leading-tight">{user.name}</p>
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter mt-0.5">ID: {user._id.slice(-6).toUpperCase()}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Mail size={12} className="text-slate-300" />
+                          <p className="text-sm font-bold text-slate-600 dark:text-slate-400">{user.email}</p>
+                        </div>
+                        <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 ml-5 italic">{user.phoneNumber || 'No phone number'}</p>
+                      </td>
+                      <td className="px-6 py-6 font-center">
+                        <div className="relative group/select w-40 mx-auto">
                           <select
                             value={user.role}
                             onChange={(e) => handleRoleChange(user._id, e.target.value)}
                             disabled={user.role === 'super-admin'}
-                            className={`block w-full text-[10px] py-3 pl-4 pr-10 rounded-xl font-black uppercase tracking-widest border border-slate-100 dark:border-slate-800 appearance-none outline-none focus:ring-4 transition-all cursor-pointer ${
-                              user.role === 'super-admin' ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 opacity-80 cursor-not-allowed' :
-                              user.role === 'admin' ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 focus:ring-indigo-500/10' :
-                              'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white focus:ring-slate-500/10'
+                            className={`block w-full text-[10px] py-2.5 pl-4 pr-10 rounded-xl font-black uppercase tracking-widest border border-slate-100 dark:border-slate-800 appearance-none outline-none focus:ring-4 transition-all cursor-pointer ${
+                              user.role === 'super-admin' ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 cursor-not-allowed opacity-80' :
+                              user.role === 'admin' ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100' :
+                              'bg-white dark:bg-slate-950 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                             }`}
                           >
-                             <option value="user">Customer</option>
+                            <option value="user">Customer</option>
                             <option value="admin">Admin</option>
                             {user.role === 'super-admin' && <option value="super-admin">Super Admin</option>}
                           </select>
                           <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover/select:translate-y-0.5 transition-transform" />
-                       </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 group-hover:border-indigo-100 dark:group-hover:border-indigo-900 transition-colors">
-                    <div className="flex items-center justify-between">
-                       <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none">Registered</p>
-                       <p className="text-[10px] font-black text-slate-900 dark:text-white leading-none">
-                        {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
-                       </p>
-                    </div>
-                  </div>
-                </div>
-              )) : (
-                 <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 py-32 text-center">
-                  <div className="bg-slate-100 dark:bg-slate-950/50 p-10 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-800 max-w-sm mx-auto flex flex-col items-center">
-                    <Users size={40} className="text-slate-200 dark:text-slate-800 mb-4" />
-                    <p className="text-base font-black text-slate-900 dark:text-white uppercase tracking-widest">No Users Found</p>
-                    <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-2">Try adjusting your search or check back later.</p>
-                  </div>
-                </div>
-              )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-6">
+                        <div className="space-y-0.5">
+                          <p className="text-xs font-bold text-slate-900 dark:text-white">{new Date(user.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                          <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Member since</p>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6 text-right">
+                        {user.role !== 'super-admin' && (
+                          <button 
+                            onClick={() => handleDelete(user._id, user.name)} 
+                            className="h-10 w-10 rounded-2xl bg-white dark:bg-slate-900 text-rose-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:bg-rose-500 hover:text-white shadow-sm ring-1 ring-slate-100 dark:ring-slate-700 ml-auto"
+                            title="Delete User"
+                          >
+                            <Trash2 size={16} strokeWidth={2.5} />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan={5} className="py-24 text-center">
+                        <div className="flex flex-col items-center">
+                          <Users size={32} className="text-slate-200 dark:text-slate-800 mb-4" />
+                          <p className="text-sm font-black text-slate-400 uppercase tracking-widest">No matching users found</p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
