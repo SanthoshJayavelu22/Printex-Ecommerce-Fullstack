@@ -1,8 +1,21 @@
+import path from 'path';
 import Product, { IProduct } from '../models/Product';
 import Category from '../models/Category';
 import ErrorResponse from '../utils/errorResponse';
 import advancedResults from '../utils/advancedResults';
 import { createSlug } from '../utils/slugify';
+
+// Helper to sanitize file path for database (always save as public/uploads/...)
+const normalizePath = (filePath: string) => {
+    // Convert all backslashes to forward slashes
+    const normalized = filePath.replace(/\\/g, '/');
+    // If it's an absolute path, find the 'public' part and keep it from there
+    const publicIndex = normalized.indexOf('public/');
+    if (publicIndex !== -1) {
+        return normalized.substring(publicIndex);
+    }
+    return normalized;
+};
 
 export const createProduct = async (productData: any, files: any, adminId: any) => {
     if (!productData.slug && productData.name) {
@@ -70,10 +83,10 @@ export const createProduct = async (productData: any, files: any, adminId: any) 
     let images: string[] = [];
     if (files && (files.mainImage || files.additionalImages)) {
         if (files.mainImage && files.mainImage[0]) {
-            images.push(files.mainImage[0].path.replace(/\\/g, '/'));
+            images.push(normalizePath(files.mainImage[0].path));
         }
         if (files.additionalImages && Array.isArray(files.additionalImages)) {
-            files.additionalImages.forEach((file: any) => images.push(file.path.replace(/\\/g, '/')));
+            files.additionalImages.forEach((file: any) => images.push(normalizePath(file.path)));
         }
     } else if (productData.images && Array.isArray(productData.images)) {
         images = productData.images;
@@ -175,10 +188,10 @@ export const updateProduct = async (productId: string, updateData: any, files: a
     const hasNewFiles = files && (files.mainImage || files.additionalImages);
     if (hasNewFiles) {
         if (files.mainImage && files.mainImage[0]) {
-            mergedImages.unshift(files.mainImage[0].path.replace(/\\/g, '/'));
+            mergedImages.unshift(normalizePath(files.mainImage[0].path));
         }
         if (files.additionalImages && Array.isArray(files.additionalImages)) {
-             files.additionalImages.forEach((file: any) => mergedImages.push(file.path.replace(/\\/g, '/')));
+             files.additionalImages.forEach((file: any) => mergedImages.push(normalizePath(file.path)));
         }
     }
     
