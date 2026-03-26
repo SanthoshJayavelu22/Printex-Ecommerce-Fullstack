@@ -79,8 +79,8 @@ app.use('/api/contacts', contactRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 
-// Serve static files
-app.use('/public', express.static(path.join(process.cwd(), 'public')));
+// Serve static files (Accessed via /api/public/...)
+app.use('/api/public', express.static(path.join(process.cwd(), 'public')));
 
 app.get('/', (req: Request, res: Response) => {   
     res.send('Printix Labels API is running...');

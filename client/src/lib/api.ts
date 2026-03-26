@@ -68,7 +68,7 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
 export const getImageUrl = (url?: string) => {
   if (!url) return '/placeholder.png';
   if (url.startsWith('http')) return url;
-  // Remove /api from end of API_URL to get base server URL
-  const baseUrl = API_URL.replace(/\/api$/, '');
-  return `${baseUrl}/${url.replace(/\\/g, '/')}`;
+  
+  // Use API_URL directly to ensure requests go through the backend proxy (/api)
+  return `${API_URL}/${url.replace(/\\/g, '/')}`;
 };
