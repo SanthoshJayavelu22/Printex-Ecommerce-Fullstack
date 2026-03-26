@@ -68,7 +68,16 @@ export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {
 export const getImageUrl = (url?: string) => {
   if (!url) return '/placeholder.png';
   if (url.startsWith('http')) return url;
+  if (url.startsWith('/')) return url; // Static assets in client/public
   
-  // Use API_URL directly to ensure requests go through the backend proxy (/api)
-  return `${API_URL}/${url.replace(/\\/g, '/')}`;
+  // For server-side uploads, ensure they go through /api/public if not already prefixed
+  const normalizedPath = url.replace(/\\/g, '/');
+  if (normalizedPath.startsWith('public/')) {
+    return `${API_URL}/${normalizedPath}`;
+  }
+  
+  // If it's an upload but doesn't have public/, we might need to add it or it might be handled differently
+  // Based on your server config: app.use('/api/public', express.static(...))
+  // If the DB has 'uploads/products/x.png', we need '/api/public/uploads/products/x.png'
+  return `${API_URL}/public/${normalizedPath}`;
 };

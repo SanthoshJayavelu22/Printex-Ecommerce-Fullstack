@@ -77,8 +77,18 @@ export default function AdminOrders() {
     }
   };
 
+  const [activeTab, setActiveTab] = useState<"all" | "design" | "standard">("all");
+
   const filteredOrders = Array.isArray(orders) 
-    ? orders.filter(o => o._id.includes(searchTerm) || (o.user && o.user.name.toLowerCase().includes(searchTerm.toLowerCase()))) 
+    ? orders.filter(o => {
+        const matchesSearch = o._id.includes(searchTerm) || (o.user && o.user.name.toLowerCase().includes(searchTerm.toLowerCase()));
+        if (!matchesSearch) return false;
+
+        const needsDesign = o.items?.some((it: any) => it.needsDesign);
+        if (activeTab === "design") return needsDesign;
+        if (activeTab === "standard") return !needsDesign;
+        return true;
+      }) 
     : [];
 
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
@@ -107,6 +117,14 @@ export default function AdminOrders() {
     }
   };
 
+  const getOrderDesignSummary = (order: any) => {
+    const totalItems = order.items?.length || 0;
+    const needsDesignCount = order.items?.filter((it: any) => it.needsDesign).length || 0;
+    if (needsDesignCount === 0) return { label: "Standard", color: "text-slate-400" };
+    if (needsDesignCount === totalItems) return { label: "Full Design Needed", color: "text-amber-600" };
+    return { label: `Design Needed (${needsDesignCount}/${totalItems})`, color: "text-amber-500" };
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
       {/* Header Section */}
@@ -120,7 +138,7 @@ export default function AdminOrders() {
         </div>
         
         <div className="flex items-center gap-3">
-           <div className="hidden sm:flex items-center gap-6 bg-white dark:bg-slate-900 px-8 py-4 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm">
+            <div className="hidden sm:flex items-center gap-6 bg-white dark:bg-slate-900 px-8 py-4 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm">
               <div className="flex flex-col items-center">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Active</span>
                 <div className="h-2 w-10 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.3)]" />
@@ -141,6 +159,24 @@ export default function AdminOrders() {
         </div>
       </div>
 
+      {/* Tabs / Filter Navigation */}
+      <div className="flex items-center gap-4 bg-white/50 dark:bg-slate-900/50 p-2 rounded-[2.5rem] border border-slate-200/50 dark:border-slate-800/50 w-fit">
+        {[
+          { id: "all", label: "All Orders", icon: <Package size={16} /> },
+          { id: "design", label: "Pro Design Needed", icon: <Clock size={16} className="text-amber-500" /> },
+          { id: "standard", label: "No Design Needed", icon: <CheckCircle size={16} className="text-emerald-500" /> }
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => { setActiveTab(tab.id as any); setCurrentPage(1); }}
+            className={`flex items-center gap-3 px-8 py-4 rounded-[2rem] text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-primary text-white shadow-xl shadow-primary/20 scale-105' : 'text-slate-500 hover:bg-white dark:hover:bg-slate-800 hover:text-primary'}`}
+          >
+            {tab.icon}
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {/* Main Table View Wrapper */}
       <div className="rounded-[2.5rem] bg-white dark:bg-slate-900 shadow-premium border border-slate-100 dark:border-slate-800 overflow-visible">
         <div className="p-8 flex flex-col md:flex-row justify-between items-center gap-6">
@@ -157,8 +193,8 @@ export default function AdminOrders() {
             />
           </div>
           
-          <div className="px-8 py-4 bg-primary/5 dark:bg-primary/10 rounded-[1.5rem] border border-primary/10">
-             <span className="text-[11px] font-black text-primary dark:text-primary-foreground uppercase tracking-[0.2em]">Total Orders: {filteredOrders.length}</span>
+          <div className="px-8 py-4 bg-primary/5 dark:bg-primary/10 rounded-[1.5rem] border border-primary/10 flex items-center gap-4">
+             <span className="text-[11px] font-black text-primary dark:text-primary-foreground uppercase tracking-[0.2em]">Showing: {filteredOrders.length}</span>
           </div>
         </div>
 
@@ -175,6 +211,7 @@ export default function AdminOrders() {
                 <tr className="text-slate-400 dark:text-slate-500">
                   <th className="px-6 py-2 text-[11px] font-black uppercase tracking-[0.2em]">Order Logistics</th>
                   <th className="px-6 py-2 text-[11px] font-black uppercase tracking-[0.2em]">Customer Profile</th>
+                  <th className="px-6 py-2 text-[11px] font-black uppercase tracking-[0.2em]">Design</th>
                   <th className="px-6 py-2 text-[11px] font-black uppercase tracking-[0.2em]">Financials</th>
                   <th className="px-6 py-2 text-[11px] font-black uppercase tracking-[0.2em] text-right pr-12">Fulfillment</th>
                 </tr>
@@ -219,6 +256,16 @@ export default function AdminOrders() {
                              <span className="truncate max-w-[150px]">{order.user?.email || "No contact info"}</span>
                            </div>
                         </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-6">
+                      <div className="flex flex-col gap-1.5">
+                        <span className={`text-[11px] font-black uppercase tracking-widest ${getOrderDesignSummary(order).color}`}>
+                          {getOrderDesignSummary(order).label}
+                        </span>
+                        {order.items?.some((it: any) => it.designUrl) && (
+                          <span className="text-[9px] text-emerald-600 font-bold uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full w-fit">Files Ready</span>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-6">
@@ -396,8 +443,10 @@ export default function AdminOrders() {
                                  </div>
                                )}
                                <div className="flex-1 min-w-0">
-                                  <div className="flex justify-between items-start gap-2">
-                                     <p className="text-xs font-black text-slate-900 dark:text-white truncate">{item.name}</p>
+                                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-2">
+                                     <div className="flex-1">
+                                        <p className="text-sm font-black text-slate-900 dark:text-white leading-tight">{item.name}</p>
+                                     </div>
                                      {item.designUrl ? (
                                         <a 
                                           href={getImageUrl(item.designUrl)} 
