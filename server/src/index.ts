@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
+import path from 'path';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import cors from 'cors';
@@ -79,7 +80,7 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 
 // Serve static files
-app.use('/public', express.static('public'));
+app.use('/public', express.static(path.join(process.cwd(), 'public')));
 
 app.get('/', (req: Request, res: Response) => {   
     res.send('Printix Labels API is running...');
